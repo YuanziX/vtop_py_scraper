@@ -1,6 +1,7 @@
 import aiohttp
 from bs4 import BeautifulSoup
 import re
+
 from constants import vtop_profile_url
 from payloads import get_profile_payload
 
