@@ -1,5 +1,4 @@
 import aiohttp
-from bs4 import BeautifulSoup
 import pandas as pd
 
 from constants import vtop_process_attendance_url, current_semIDs

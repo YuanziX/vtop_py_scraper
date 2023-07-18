@@ -63,9 +63,9 @@ def _parse_timetable(timetable_page: str):
                     timetable_df.iloc[row_idx, col_idx])
                 timetable[day].append({
                     "slot": slot,
-                    "courseName": course_code_dict[code],
+                    "name": course_code_dict[code],
                     "code": code,
-                    "class": cls,
+                    "location": cls,
                     "startTime": timetable_df.iloc[0, col_idx] if is_theory else timetable_df.iloc[2, col_idx],
                     "endTime": timetable_df.iloc[1, col_idx] if is_theory else timetable_df.iloc[3, col_idx],
                 })
