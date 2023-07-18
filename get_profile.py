@@ -29,6 +29,6 @@ async def get_profile_data(sess: aiohttp.ClientSession, uname: str) -> dict:
         field_name = _clean_up_text(row.contents[1].string)
         if (field_name in desired_fields):
             data[field_name] = _clean_up_text(row.contents[3].string)
-    data['Program'] = '.'.join(data['Program'].split())
+    # data['Program'] = '.'.join(data['Program'].split())
 
     return data

@@ -84,4 +84,4 @@ async def get_timetable_data(sess: aiohttp.ClientSession, username: str):
     for id in current_semIDs:
         timetable = _get_valid_timetable_data(await _get_timetable_page(sess, username, id))
         if timetable[1]:
-            return timetable
+            return timetable[0]

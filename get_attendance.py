@@ -44,6 +44,6 @@ async def get_attendance_data(sess: aiohttp.ClientSession, username: str):
     for id in current_semIDs:
         attendance = _get_valid_attendance_data(await _get_attendance_page(sess, username, id))
         if attendance[1]:
-            return attendance
+            return attendance[0]
     else:
         return {'result': 'fail'}
