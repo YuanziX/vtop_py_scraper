@@ -1,4 +1,3 @@
-from typing import Tuple
 import aiohttp
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -74,15 +73,15 @@ def _parse_timetable(timetable_page: str):
     return timetable
 
 
-async def _get_valid_timetable_data(sess: aiohttp.ClientSession, username: str, semID: str):
+def _get_valid_timetable_data(timetable_page: str):
     try:
-        return (_parse_timetable(await _get_timetable_page(sess, username, semID)), True)
+        return _parse_timetable(timetable_page), True
     except:
-        return ({}, False)
+        return {}, False
 
 
 async def get_timetable_data(sess: aiohttp.ClientSession, username: str):
     for id in current_semIDs:
-        timetable = await _get_valid_timetable_data(sess, username, id)
+        timetable = _get_valid_timetable_data(await _get_timetable_page(sess, username, id))
         if timetable[1]:
             return timetable

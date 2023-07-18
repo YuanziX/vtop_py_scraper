@@ -10,8 +10,13 @@ def get_login_payload(username: str, password: str, captcha: str) -> dict:
 
 
 def get_profile_payload(username: str) -> dict:
-    return {'verifyMenu': 'true', 'winImage': 'undefined', 'authorizedID': username, 'nocache': '@(new Date().getTime()'}
+    return {'verifyMenu': 'true', 'winImage': 'undefined', 'authorizedID': username,
+            'nocache': '@(new Date().getTime()'}
 
 
-def get_timetable_payload(username, semID):
+def get_timetable_payload(username: str, semID: str) -> dict:
+    return {'semesterSubId': semID, 'authorizedID': username, 'x': get_current_time()}
+
+
+def get_attendance_payload(username: str, semID: str) -> dict:
     return {'semesterSubId': semID, 'authorizedID': username, 'x': get_current_time()}
