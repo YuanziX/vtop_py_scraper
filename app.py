@@ -15,8 +15,8 @@ def root():
 
 
 async def handle_request(data_func):
-    username = request.args.get('username')
-    password = request.args.get('password')
+    username = request.form.get('username')
+    password = request.form.get('password')
 
     if username == '' or username is None or password == '' or password == None:
         abort(401)
@@ -28,9 +28,9 @@ async def handle_request(data_func):
             abort(401)
 
 
-@app.route('/api/profile', methods=['GET'])
-@app.route('/api/attendance', methods=['GET'])
-@app.route('/api/timetable', methods=['GET'])
+@app.route('/api/profile', methods=['POST'])
+@app.route('/api/attendance', methods=['POST'])
+@app.route('/api/timetable', methods=['POST'])
 async def handle_data():
     data_func = {
         '/api/profile': get_profile_data,
@@ -40,10 +40,10 @@ async def handle_data():
     return await handle_request(data_func[request.path])
 
 
-@app.route('/api/all', methods=['GET'])
+@app.route('/api/all', methods=['POST'])
 async def all_data():
-    username = request.args.get('username')
-    password = request.args.get('password')
+    username = request.form.get('username')
+    password = request.form.get('password')
 
     if username == '' or username == None or password == '' or password == None:
         abort(401)
