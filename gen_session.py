@@ -74,6 +74,6 @@ async def gen_session(sess: aiohttp.ClientSession, uname: str, passwd: str) -> b
         captcha = _solve_captcha(re.search(r';base64, (.+)" />', await req.text()).group(1))
         async with sess.post(vtop_doLogin_url, data=get_login_payload(uname, passwd, captcha)) as resp:
             text = await resp.text()
-            if ('Invalid' in text or 'exception' in text):
+            if ('Invalid' in text or 'exception' in text or 'inactivity' in text):
                 return False
             return True
