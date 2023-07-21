@@ -8,6 +8,9 @@ from get_timetable import get_timetable_data
 
 app = Flask(__name__)
 
+def basic_creds_check(username: str, password: str):
+    if username == '' or username == None or password == '' or password == None:
+        abort(401)
 
 @app.route('/')
 def root():
@@ -18,8 +21,8 @@ async def handle_request(data_func):
     username = request.form.get('username')
     password = request.form.get('password')
 
-    if username == '' or username is None or password == '' or password == None:
-        abort(401)
+    basic_creds_check(username, password)
+
 
     async with ClientSession() as sess:
         if await gen_session(sess, username, password):
@@ -40,13 +43,27 @@ async def handle_data():
     return await handle_request(data_func[request.path])
 
 
+@app.route('/api/verify', methods=['POST'])
+async def verify_creds():
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    basic_creds_check(username, password)
+
+    async with ClientSession() as sess:
+        if await gen_session(sess, username, password):
+            return jsonify({'isValid': True})
+        else:
+            abort(401)
+
+
 @app.route('/api/all', methods=['POST'])
 async def all_data():
     username = request.form.get('username')
     password = request.form.get('password')
 
-    if username == '' or username == None or password == '' or password == None:
-        abort(401)
+    basic_creds_check(username, password)
+
 
     async with ClientSession() as sess:
         if await gen_session(sess, username, password):
