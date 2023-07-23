@@ -3,6 +3,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 from constants import vtop_process_timetable_url, current_semIDs
+from models.period import Period
 from payloads import get_timetable_payload
 
 
@@ -25,6 +26,38 @@ def _get_course_code_with_name(soup: BeautifulSoup) -> dict:
     return course_data_dict
 
 
+def _parse_theory_vals(s):
+    temp_arr = str(s).strip().split("-")
+    slot = temp_arr[0]
+    course_code = temp_arr[1]
+    cls = "-".join(temp_arr[3:])
+
+    return slot, course_code, cls
+
+
+def _get_lab_slot(slot: str) -> str:
+    num = int(slot.replace('L', ''))
+
+    return f'L{num}+{num + 1}' if num % 2 else f'L{num - 1}+{num}'
+
+
+def _parse_lab_vals(s):
+    temp_arr = str(s).strip().split("-")
+    slot = _get_lab_slot(temp_arr[0])
+    course_code = temp_arr[1]
+    cls = "-".join(temp_arr[3:])
+
+    return slot, course_code, cls
+
+
+def _get_theory_end_time(start_time: str):
+    return f'{start_time.split(":")[0]}:50'
+
+
+def _get_lab_end_time(start_time: str):
+    return f'{int(start_time.split(":")[0]) + 1}:40'
+
+
 def _parse_timetable(timetable_page: str):
     timetable = {
         'Tuesday': [],
@@ -40,13 +73,6 @@ def _parse_timetable(timetable_page: str):
     days_map = {"MON": "Monday", "TUE": 'Tuesday', "WED": 'Wednesday',
                 "THU": 'Thursday', "FRI": 'Friday', "SAT": "Saturday", "SUN": "Sunday"}
 
-    def _get_vals(s):
-        temp_arr = str(s).strip().split("-")
-        slot = temp_arr[0]
-        course_code = temp_arr[1]
-        cls = "-".join(temp_arr[3:])
-
-        return slot, course_code, cls
     timetable_df = pd.read_html(timetable_page)[1]
 
     for row_idx in range(3, timetable_df.shape[0]):
@@ -59,16 +85,22 @@ def _parse_timetable(timetable_page: str):
             is_cell_empty = cell_str.count(
                 '-') < 3 or len(cell_str) <= 3 or all([char == '-' for char in cell_str])
             if not is_cell_empty:
-                slot, code, cls = _get_vals(
-                    timetable_df.iloc[row_idx, col_idx])
-                timetable[day].append({
-                    "slot": slot,
-                    "name": course_code_dict[code],
-                    "code": code,
-                    "location": cls,
-                    "startTime": timetable_df.iloc[0, col_idx] if is_theory else timetable_df.iloc[2, col_idx],
-                    "endTime": timetable_df.iloc[1, col_idx] if is_theory else timetable_df.iloc[3, col_idx],
-                })
+                if is_theory:
+                    slot, code, location = _parse_theory_vals(cell_str)
+                    start_time = timetable_df.iloc[0, col_idx]
+
+                    cell = Period(
+                        slot=slot, courseName=course_code_dict[code], code=code, location=location, startTime=start_time, endTime=_get_theory_end_time(start_time))
+
+                else:
+                    slot, code, location = _parse_lab_vals(cell_str)
+                    start_time = timetable_df.iloc[0, col_idx]
+
+                    cell = Period(slot=slot, courseName=course_code_dict[code], code=code,
+                                  location=location, startTime=start_time, endTime=_get_lab_end_time(start_time))
+
+                if cell not in timetable[day]:
+                    timetable[day].append(cell)
 
     return timetable
 
@@ -84,4 +116,9 @@ async def get_timetable_data(sess: aiohttp.ClientSession, username: str):
     for id in current_semIDs:
         timetable = _get_valid_timetable_data(await _get_timetable_page(sess, username, id))
         if timetable[1]:
-            return timetable[0]
+            timetable_dict = {
+                key: [period.to_dict() for period in period_list]
+                for key, period_list in timetable[0].items()
+            }
+
+            return timetable_dict
