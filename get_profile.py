@@ -1,5 +1,6 @@
 import aiohttp
-from bs4 import BeautifulSoup
+import pandas as pd
+import string
 import re
 
 from constants import vtop_profile_url
@@ -7,8 +8,14 @@ from payloads import get_profile_payload
 
 
 def _clean_up_text(s: str) -> str:
-    s = re.sub('\W+', r' ', s)
-    return s if not re.match('[A-Z ].', s) else s.title()
+    return re.sub('\W+', r' ', s)
+
+def _get_value_from_column1(text: str, df: pd.DataFrame):
+    row = df[df[0] == text]
+    if not row.empty:
+        return row.iloc[0, 1]
+    else:
+        return None
 
 
 async def _get_profile_page(sess: aiohttp.ClientSession, uname: str) -> str:
@@ -19,15 +26,13 @@ async def _get_profile_page(sess: aiohttp.ClientSession, uname: str) -> str:
 async def get_profile_data(sess: aiohttp.ClientSession, uname: str) -> dict:
     profile_page = await _get_profile_page(sess, uname)
     data = {}
-    desired_fields = ['Application Number', 'Student Name', 'Date Of Birth',
-                      'Gender', 'VIT Register Number', 'Program', 'Branch', 'School', 'Mobile Number']
+    desired_fields = ['Student  Name', 'Application  Number', 'Program', 'Branch', 'School']
 
-    soup = BeautifulSoup(profile_page, 'lxml')
-    rows = soup.find_all('tr')
+    profile_df = pd.read_html(profile_page)[0]
 
-    for row in rows:
-        field_name = _clean_up_text(row.contents[1].string)
-        if (field_name in desired_fields):
-            data[field_name] = _clean_up_text(row.contents[3].string)
+    data['image'] = re.findall(r'src="data:null;base64,(.*)"', profile_page)[0]
+    for field in desired_fields:
+        data[_clean_up_text(field)] = string.capwords(_get_value_from_column1(field, profile_df))
+    data['VIT Registration Number'] = _get_value_from_column1('VIT  Register Number', profile_df)
 
     return data
