@@ -13,22 +13,23 @@ async def _get_attendance_page(sess: aiohttp.ClientSession, username: str, semID
 def _parse_attendance(attendance_page: str):
     table_df = pd.read_html(attendance_page)[0]
 
-    attendance = {}
+    attendance = []
 
     for index, row in table_df.iterrows():
         code = row['Course  Code']
         if code == 'Total Number Of Credits: 0':
             raise Exception
 
-        attendance.setdefault(code, {})[row['Course  Type']] = {
-            'Name': row['Course  Title'],
-            'Slot': row['Slot'],
-            'Total Classes': row['Total Classes'],
-            'Attended Classes': row['Attended Classes'],
-            'Attendance Percentage': row['Attendance Percentage']
-        }
+        attendance.append({
+            'name': row['Course  Title'],
+            'courseType': row['Course  Type'],
+            'slot': row['Slot'],
+            'totalClasses': row['Total Classes'],
+            'attendedClasses': row['Attended Classes'],
+            'attendancePercentage': row['Attendance Percentage']
+        })
 
-    attendance.popitem()
+    attendance.pop()
     return attendance
 
 
@@ -45,4 +46,4 @@ async def get_attendance_data(sess: aiohttp.ClientSession, username: str):
         if attendance[1]:
             return attendance[0]
     else:
-        return {'result': 'fail'}
+        return {}

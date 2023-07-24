@@ -116,9 +116,15 @@ async def get_timetable_data(sess: aiohttp.ClientSession, username: str):
     for id in current_semIDs:
         timetable = _get_valid_timetable_data(await _get_timetable_page(sess, username, id))
         if timetable[1]:
+            temp_tt = timetable[0]
+            for key, periods in temp_tt.items():
+                temp_tt[key] = sorted(periods)
+
             timetable_dict = {
                 key: [period.to_dict() for period in period_list]
-                for key, period_list in timetable[0].items()
+                for key, period_list in temp_tt.items()
             }
 
             return timetable_dict
+    else:
+        return {}

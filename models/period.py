@@ -10,12 +10,15 @@ class Period:
     def __eq__(self, other):
         return self.slot == other.slot and self.code == other.code
 
+    def __lt__(self, other):
+        return self.startTime < other.startTime
+
     def to_dict(self):
         return {
             "slot": self.slot,
             "courseName": self.courseName,
             "code": self.code,
-            "class": self.location,
+            "location": self.location,
             "startTime": self.startTime,
             "endTime": self.endTime
         }
