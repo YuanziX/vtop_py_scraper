@@ -8,9 +8,11 @@ from get_timetable import get_timetable_data
 
 app = Flask(__name__)
 
+
 def basic_creds_check(username: str, password: str):
     if username == '' or username == None or password == '' or password == None:
         abort(401)
+
 
 @app.route('/')
 def root():
@@ -22,7 +24,6 @@ async def handle_request(data_func):
     password = request.form.get('password')
 
     basic_creds_check(username, password)
-
 
     async with ClientSession() as sess:
         if await gen_session(sess, username, password):
@@ -63,7 +64,6 @@ async def all_data():
     password = request.form.get('password')
 
     basic_creds_check(username, password)
-
 
     async with ClientSession() as sess:
         if await gen_session(sess, username, password):

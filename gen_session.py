@@ -1,7 +1,7 @@
 from typing import Union
-from payloads import get_login_payload
+from utils.payloads import get_login_payload
 import aiohttp
-from constants import *
+from constants.constants import *
 import json
 import base64
 import numpy as np
@@ -14,7 +14,7 @@ from PIL import Image
 CAPTCHA_DIM = (180, 45)
 CHARACTER_DIM = (30, 32)
 
-bitmaps_path = os.path.join(os.path.dirname(__file__), 'bitmaps.json')
+bitmaps_path = os.path.join(os.path.dirname(__file__), 'constants/bitmaps.json')
 BITMAPS = json.load(open(bitmaps_path))
 BITMAPS = {k: np.array(v) for k, v in BITMAPS.items()}
 

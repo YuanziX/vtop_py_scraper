@@ -1,8 +1,8 @@
 import aiohttp
 import pandas as pd
 
-from constants import vtop_process_attendance_url, current_semIDs
-from payloads import get_attendance_payload
+from constants.constants import vtop_process_attendance_url, current_semIDs
+from utils.payloads import get_attendance_payload
 
 
 async def _get_attendance_page(sess: aiohttp.ClientSession, username: str, semID: str):
