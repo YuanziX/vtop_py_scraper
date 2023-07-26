@@ -74,7 +74,8 @@ async def all_data():
             data = {
                 'profile': await get_profile_data(sess, username),
                 'attendance': await get_attendance_data(sess, username),
-                'timetable': await get_timetable_data(sess, username)
+                'timetable': await get_timetable_data(sess, username),
+                'semIDs': await get_sem_ids(sess, username)
             }
 
             return jsonify(data)
