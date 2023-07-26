@@ -5,6 +5,8 @@ from gen_session import gen_session
 from get_profile import get_profile_data
 from get_attendance import get_attendance_data
 from get_timetable import get_timetable_data
+from get_sem_ids import get_sem_ids
+from get_marks import get_marks_data
 
 app = Flask(__name__)
 
@@ -35,11 +37,13 @@ async def handle_request(data_func):
 @app.route('/api/profile', methods=['POST'])
 @app.route('/api/attendance', methods=['POST'])
 @app.route('/api/timetable', methods=['POST'])
+@app.route('/api/semIDs', methods=['POST'])
 async def handle_data():
     data_func = {
         '/api/profile': get_profile_data,
         '/api/attendance': get_attendance_data,
-        '/api/timetable': get_timetable_data
+        '/api/timetable': get_timetable_data,
+        '/api/semIDs': get_sem_ids
     }
     return await handle_request(data_func[request.path])
 
@@ -76,6 +80,22 @@ async def all_data():
             return jsonify(data)
         else:
             abort(401)
+
+
+@app.route('/api/marks', methods=['POST'])
+async def marks():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    semID = request.form.get('semID')
+
+    basic_creds_check(username, password)
+
+    async with ClientSession() as sess:
+        if await gen_session(sess, username, password):
+            return jsonify(await get_marks_data(sess, username, semID))
+        else:
+            abort(401)
+
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')

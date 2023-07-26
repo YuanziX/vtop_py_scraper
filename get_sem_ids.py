@@ -2,11 +2,11 @@ import aiohttp
 from bs4 import BeautifulSoup
 
 from constants.constants import vtop_marks_view_url
-from utils.payloads import get_marks_view_payload
+from utils.payloads import get_marks_view_sem_ids_payload
 
 
 async def _get_marks_view_page(sess: aiohttp.ClientSession, uname: str) -> str:
-    async with sess.post(vtop_marks_view_url, data=get_marks_view_payload(uname)) as req:
+    async with sess.post(vtop_marks_view_url, data=get_marks_view_sem_ids_payload(uname)) as req:
         return await req.text()
 
 

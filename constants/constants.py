@@ -9,6 +9,7 @@ vtop_timetable_url = "https://vtop2.vitap.ac.in/vtop/academics/common/StudentTim
 vtop_process_timetable_url = "https://vtop2.vitap.ac.in/vtop/processViewTimeTable"
 vtop_process_attendance_url = "https://vtop2.vitap.ac.in/vtop/processViewStudentAttendance"
 vtop_marks_view_url = "https://vtop2.vitap.ac.in/vtop/examinations/StudentMarkView"
+vtop_doMarks_view_url = "https://vtop2.vitap.ac.in/vtop/examinations/doStudentMarkView"
 
 current_semIDs = [
     "TestFakeID",

@@ -2,9 +2,10 @@ import aiohttp
 import pandas as pd
 from bs4 import BeautifulSoup
 
-from constants.constants import vtop_process_timetable_url, current_semIDs
+from constants.constants import vtop_process_timetable_url
 from models.period import Period
 from utils.payloads import get_timetable_payload
+from utils.sem_ids import semIDs
 
 
 async def _get_timetable_page(sess: aiohttp.ClientSession, username: str, semID: str) -> str:
@@ -113,7 +114,7 @@ def _get_valid_timetable_data(timetable_page: str):
 
 
 async def get_timetable_data(sess: aiohttp.ClientSession, username: str):
-    for id in current_semIDs:
+    for id in semIDs:
         timetable = _get_valid_timetable_data(await _get_timetable_page(sess, username, id))
         if timetable[1]:
             temp_tt = timetable[0]
