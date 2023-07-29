@@ -25,7 +25,7 @@ def _parse_marks(marks_page):
         marks_data[course[1]] = {
             "courseName": course[3],
             "courseType": course[4],
-            "professor": f"Prof.{capwords(course[6].split('.')[1])}",
+            "professor": course[6],
             "courseSlot": course[7],
             "marks": {}
         }
