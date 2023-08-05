@@ -28,3 +28,7 @@ def get_marks_view_sem_ids_payload(username: str) -> dict:
 
 def get_doMarks_view_payload(username: str, semID: str) -> dict:
     return {'authorizedID': username, 'semesterSubId': semID}
+
+
+def get_gradeHistory_payload(username: str) -> dict:
+    return get_profile_payload(username)

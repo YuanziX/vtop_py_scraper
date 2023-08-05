@@ -1,17 +1,15 @@
 user_agent_header = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67'}
 
-vtop_base_url = "https://vtop2.vitap.ac.in/vtop/"
-vtop_login_url = "https://vtop2.vitap.ac.in/vtop/vtopLogin"
-vtop_doLogin_url = "https://vtop2.vitap.ac.in/vtop/doLogin"
-vtop_profile_url = "https://vtop2.vitap.ac.in/vtop/studentsRecord/StudentProfileAllView"
-vtop_timetable_url = "https://vtop2.vitap.ac.in/vtop/academics/common/StudentTimeTable"
-vtop_process_timetable_url = "https://vtop2.vitap.ac.in/vtop/processViewTimeTable"
-vtop_process_attendance_url = "https://vtop2.vitap.ac.in/vtop/processViewStudentAttendance"
-vtop_marks_view_url = "https://vtop2.vitap.ac.in/vtop/examinations/StudentMarkView"
-vtop_doMarks_view_url = "https://vtop2.vitap.ac.in/vtop/examinations/doStudentMarkView"
 
-current_semIDs = [
-    "TestFakeID",
-    "AP2022237"
-]
+vtop_base_url = "https://vtop2.vitap.ac.in/vtop/"
+
+vtop_login_url = f"{vtop_base_url}vtopLogin"
+vtop_doLogin_url = f"{vtop_base_url}doLogin"
+vtop_profile_url = f"{vtop_base_url}studentsRecord/StudentProfileAllView"
+vtop_timetable_url = f"{vtop_base_url}academics/common/StudentTimeTable"
+vtop_process_timetable_url = f"{vtop_base_url}processViewTimeTable"
+vtop_process_attendance_url = f"{vtop_base_url}processViewStudentAttendance"
+vtop_marks_view_url = f"{vtop_base_url}examinations/StudentMarkView"
+vtop_doMarks_view_url = f"{vtop_base_url}examinations/doStudentMarkView"
+vtop_gradeHistory_url = f"{vtop_base_url}examinations/examGradeView/StudentGradeHistory"

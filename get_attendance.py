@@ -1,7 +1,7 @@
 import aiohttp
 import pandas as pd
 
-from constants.constants import vtop_process_attendance_url, current_semIDs
+from constants.constants import vtop_process_attendance_url
 from utils.payloads import get_attendance_payload
 from utils.sem_ids import semIDs
 
