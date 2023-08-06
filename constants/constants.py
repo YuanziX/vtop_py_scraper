@@ -13,3 +13,5 @@ vtop_process_attendance_url = f"{vtop_base_url}processViewStudentAttendance"
 vtop_marks_view_url = f"{vtop_base_url}examinations/StudentMarkView"
 vtop_doMarks_view_url = f"{vtop_base_url}examinations/doStudentMarkView"
 vtop_gradeHistory_url = f"{vtop_base_url}examinations/examGradeView/StudentGradeHistory"
+
+current_sem_IDs = ['AP2023243', 'AP2023242']
