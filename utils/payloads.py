@@ -32,3 +32,7 @@ def get_doMarks_view_payload(username: str, semID: str) -> dict:
 
 def get_gradeHistory_payload(username: str) -> dict:
     return get_profile_payload(username)
+
+
+def get_examSchedule_payload(username: str, semID: str) -> dict:
+    return get_doMarks_view_payload(username, semID)
