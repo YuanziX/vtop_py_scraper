@@ -10,8 +10,12 @@ async def _get_grades_page(sess: aiohttp.ClientSession, uname: str) -> str:
 
 async def get_grades_data(sess: aiohttp.ClientSession, uname: str):
     grades_page = await _get_grades_page(sess, uname)
-    tables = pd.read_html(grades_page)
     
+    try:
+        tables = pd.read_html(grades_page)
+    except:
+        return {}
+
     grade_data = {}
 
     grade_data['creditsEarned'] = tables[-1].iloc[1, 1]
