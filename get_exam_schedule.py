@@ -1,6 +1,7 @@
 import re
 import aiohttp
 import pandas as pd
+from math import isnan
 
 from utils.payloads import get_examSchedule_payload
 from constants.constants import vtop_examSchedule_url, current_sem_IDs
@@ -9,6 +10,12 @@ from constants.constants import vtop_examSchedule_url, current_sem_IDs
 async def _get_examSchedule_page(sess: aiohttp.ClientSession, uname: str, semID: str) -> str:
     async with sess.post(vtop_examSchedule_url, data=get_examSchedule_payload(uname, semID)) as req:
         return await req.text()
+
+def _return_dash_if_nan(value):
+    if isnan(value):
+        return '-'
+    else:
+        return value
 
 
 async def _parse_examSchedule(examSchedule_page: str):    
@@ -28,10 +35,10 @@ async def _parse_examSchedule(examSchedule_page: str):
                 'type': row[3],
                 'classID': row[4],
                 'slot': row[5],
-                'date': row[6],
-                'session': row[7],
-                'reportingTime': row[8],
-                'duration': row[9],
+                'date': _return_dash_if_nan(row[6]),
+                'session': _return_dash_if_nan(row[7]),
+                'reportingTime': _return_dash_if_nan(row[8]),
+                'duration': _return_dash_if_nan(row[9]),
                 'venue': row[10],
                 'roomNo': row[11],
                 'seatLocation': row[12],
