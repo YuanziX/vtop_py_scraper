@@ -8,7 +8,7 @@ from constants.constants import vtop_examSchedule_url, current_sem_IDs
 
 
 async def _get_examSchedule_page(sess: aiohttp.ClientSession, uname: str, semID: str) -> str:
-    async with sess.post(vtop_examSchedule_url, data=get_examSchedule_payload(uname, semID)) as req:
+    async with sess.post(vtop_examSchedule_url, data=get_examSchedule_payload(uname, semID), verify_ssl=False) as req:
         return await req.text()
 
 def _return_dash_if_nan(value):

@@ -20,7 +20,7 @@ def _get_value_from_column1(text: str, df: pd.DataFrame):
 
 
 async def _get_profile_page(sess: aiohttp.ClientSession, uname: str) -> str:
-    async with sess.post(vtop_profile_url, data=get_profile_payload(uname)) as req:
+    async with sess.post(vtop_profile_url, data=get_profile_payload(uname), verify_ssl=False) as req:
         return await req.text()
 
 

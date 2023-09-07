@@ -5,7 +5,7 @@ from constants.constants import vtop_gradeHistory_url
 from utils.payloads import get_gradeHistory_payload
 
 async def _get_grades_page(sess: aiohttp.ClientSession, uname: str) -> str:
-    async with sess.post(vtop_gradeHistory_url, data=get_gradeHistory_payload(uname)) as req:
+    async with sess.post(vtop_gradeHistory_url, data=get_gradeHistory_payload(uname), verify_ssl=False) as req:
         return await req.text()
 
 async def get_grades_data(sess: aiohttp.ClientSession, uname: str):

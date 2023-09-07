@@ -69,10 +69,10 @@ def _solve_captcha(src: str) -> Union[str, None]:
 
 
 async def gen_session(sess: aiohttp.ClientSession, uname: str, passwd: str) -> bool:
-    await sess.get(vtop_base_url, headers=user_agent_header)
-    async with sess.post(vtop_login_url) as req:
+    await sess.get(vtop_base_url, headers=user_agent_header, verify_ssl=False)
+    async with sess.post(vtop_login_url, verify_ssl=False) as req:
         captcha = _solve_captcha(re.search(r';base64, (.+)" />', await req.text()).group(1))
-        async with sess.post(vtop_doLogin_url, data=get_login_payload(uname, passwd, captcha)) as resp:
+        async with sess.post(vtop_doLogin_url, data=get_login_payload(uname, passwd, captcha), verify_ssl=False) as resp:
             text = await resp.text()
             if ('Invalid' in text or 'exception' in text or 'inactivity' in text):
                 return False

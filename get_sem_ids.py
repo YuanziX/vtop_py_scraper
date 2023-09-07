@@ -6,7 +6,7 @@ from utils.payloads import get_marks_view_sem_ids_payload
 
 
 async def _get_marks_view_page(sess: aiohttp.ClientSession, uname: str) -> str:
-    async with sess.post(vtop_marks_view_url, data=get_marks_view_sem_ids_payload(uname)) as req:
+    async with sess.post(vtop_marks_view_url, data=get_marks_view_sem_ids_payload(uname), verify_ssl=False) as req:
         return await req.text()
 
 

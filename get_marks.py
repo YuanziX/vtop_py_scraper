@@ -7,7 +7,7 @@ from utils.payloads import get_doMarks_view_payload
 
 
 async def _get_doMarks_view_page(sess: aiohttp.ClientSession, uname: str, semID) -> str:
-    async with sess.post(vtop_doMarks_view_url, data=get_doMarks_view_payload(uname, semID)) as req:
+    async with sess.post(vtop_doMarks_view_url, data=get_doMarks_view_payload(uname, semID), verify_ssl=False) as req:
         return await req.text()
 
 

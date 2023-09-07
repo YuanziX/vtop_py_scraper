@@ -5,7 +5,7 @@ from constants.constants import vtop_process_attendance_url, current_sem_IDs
 from utils.payloads import get_attendance_payload
 
 async def _get_attendance_page(sess: aiohttp.ClientSession, username: str, semID: str):
-    async with sess.post(vtop_process_attendance_url, data=get_attendance_payload(username, semID)) as req:
+    async with sess.post(vtop_process_attendance_url, data=get_attendance_payload(username, semID), verify_ssl=False) as req:
         return await req.text()
 
 

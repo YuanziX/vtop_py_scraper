@@ -8,7 +8,7 @@ from utils.payloads import get_timetable_payload
 
 
 async def _get_timetable_page(sess: aiohttp.ClientSession, username: str, semID: str) -> str:
-    async with sess.post(vtop_process_timetable_url, data=get_timetable_payload(username, semID)) as req:
+    async with sess.post(vtop_process_timetable_url, data=get_timetable_payload(username, semID), verify_ssl=False) as req:
         return await req.text()
 
 
