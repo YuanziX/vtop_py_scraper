@@ -22,6 +22,10 @@ def get_attendance_payload(username: str, semID: str) -> dict:
     return {'semesterSubId': semID, 'authorizedID': username, 'x': get_current_time()}
 
 
+def get_attendance_detail_payload(username: str, classID: str, slotName: str) -> dict:
+    return {'classId': classID, 'slotName': slotName, 'authorizedID': username, 'x': get_current_time()}
+
+
 def get_marks_view_sem_ids_payload(username: str) -> dict:
     return get_profile_payload(username)
 
@@ -36,3 +40,7 @@ def get_gradeHistory_payload(username: str) -> dict:
 
 def get_examSchedule_payload(username: str, semID: str) -> dict:
     return get_doMarks_view_payload(username, semID)
+
+
+def get_weekend_outing_payload(username: str) -> dict:
+    return get_profile_payload(username)
