@@ -68,7 +68,6 @@ async def _parse_attendance(attendance_page: str, sess: aiohttp.ClientSession, u
             'attendanceDetail': _parse_attendance_detail(await _get_attendance_detail_page(sess, classID, row['Slot'], username)),
         })
 
-    attendance.pop()
     return attendance
 
 
