@@ -7,10 +7,6 @@ from constants.constants import vtop_profile_url
 from utils.payloads import get_profile_payload
 
 
-def _clean_up_text(s: str) -> str:
-    return re.sub('\W+', r' ', s)
-
-
 def _get_value_from_column1(text: str, df: pd.DataFrame):
     row = df[df[0] == text]
     if not row.empty:
@@ -27,16 +23,26 @@ async def _get_profile_page(sess: aiohttp.ClientSession, uname: str) -> str:
 async def get_profile_data(sess: aiohttp.ClientSession, uname: str) -> dict:
     profile_page = await _get_profile_page(sess, uname)
     data = {}
-    desired_fields = ['Student  Name',
-                      'Application  Number', 'Program', 'Branch', 'School']
+    tables = pd.read_html(profile_page)
+    desired_fields_table_0 = {'Student Name': 'Student  Name',
+                              'VIT Registration Number': 'VIT  Register Number',
+                              'Application Number': 'Application  Number',
+                              'Program': 'Program',
+                              'Branch': 'Branch',
+                              'School': 'School'
+                              }
 
-    profile_df = pd.read_html(profile_page)[0]
+    desired_fields_table_4 = {'Mentor Name': 'Faculty Name',
+                              'Mentor Cabin': 'Cabin',
+                              'Mentor Email': 'Faculty Email',
+                              'Mentor intercom': 'Faculty  intercom',
+                              'Mentor Mobile Number': 'Faculty  Mobile Number'
+                              }
 
     data['image'] = re.findall(r'src="data:null;base64,(.*)"', profile_page)[0]
-    for field in desired_fields:
-        data[_clean_up_text(field)] = string.capwords(
-            _get_value_from_column1(field, profile_df))
-    data['VIT Registration Number'] = _get_value_from_column1(
-        'VIT  Register Number', profile_df)
+    for key, field in desired_fields_table_0.items():
+        data[key] = string.capwords(_get_value_from_column1(field, tables[0]))
+    for key, field in desired_fields_table_4.items():
+        data[key] = _get_value_from_column1(field, tables[3])
 
     return data
