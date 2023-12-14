@@ -9,7 +9,6 @@ from get_sem_ids import get_sem_ids
 from get_marks import get_marks_data
 from get_grades import get_grades_data
 from get_exam_schedule import get_examSchedule_data
-from constants.registered_users import registered_users
 
 app = Flask(__name__)
 
@@ -61,9 +60,6 @@ async def verify_creds():
     password = request.form.get('password')
 
     basic_creds_check(username, password)
-
-    if username not in registered_users:
-        abort(403)
 
     async with ClientSession() as sess:
         if await gen_session(sess, username, password):
