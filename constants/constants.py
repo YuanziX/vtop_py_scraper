@@ -20,4 +20,4 @@ vtop_examSchedule_url = f"{vtop_base_url}examinations/doSearchExamScheduleForStu
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.sem_ids import semIDs
-current_sem_IDs = list(semIDs)[:3]
+current_sem_IDs = list(semIDs)[:5]

@@ -11,7 +11,7 @@ from constants.priv_constants import uname, passwd
 async def save_sem_ids():
     async with ClientSession() as sess:
         if await gen_session(sess, uname, passwd):
-            with open('constants/sem_ids.json', 'w') as f:
+            with open('constants/sem_ids.json', 'w+') as f:
                 json.dump(await get_sem_ids(sess, uname), f, indent=4)
 
 asyncio.run(save_sem_ids())
