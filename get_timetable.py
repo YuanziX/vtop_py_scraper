@@ -30,7 +30,7 @@ def _parse_theory_vals(s):
     temp_arr = str(s).strip().split("-")
     slot = temp_arr[0]
     course_code = temp_arr[1]
-    cls = f"{temp_arr[4]}-{temp_arr[3]}"
+    cls = f"{temp_arr[4]}{temp_arr[5] if len(temp_arr) == 6 else ''}-{temp_arr[3]}"
 
     return slot, course_code, cls
 
