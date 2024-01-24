@@ -8,7 +8,6 @@ from constants.constants import vtop_examSchedule_url, vtop_doExamSchedule_url, 
 
 
 async def _get_examSchedule_page(sess: aiohttp.ClientSession, uname: str, semID: str, csrf: str) -> str:
-    await sess.post(vtop_examSchedule_url, data=get_goto_page_payload(uname, csrf))
     async with sess.post(vtop_doExamSchedule_url, data=get_examSchedule_payload(uname, semID, csrf)) as req:
         if (req.status != 200):
             return "", False
@@ -48,6 +47,7 @@ async def _parse_examSchedule(examSchedule_page: str):
                 'seatNo': row[12],
             }
 
+    examSchedule_data.pop("S.No.")
     return examSchedule_data
 
 async def _get_valid_examSchedule_data(examSchedule_page: str):
