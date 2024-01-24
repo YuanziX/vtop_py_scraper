@@ -7,7 +7,7 @@ user_agent_header = {
 vtop_base_url = "https://vtop.vitap.ac.in/vtop/"
 
 vtop_profile_url = f"{vtop_base_url}studentsRecord/StudentProfileAllView"
-vtop_timetable_url = f"https://vtop.vitap.ac.in/vtop/academics/common/StudentTimeTable"
+vtop_timetable_url = f"https://vtop.vitap.ac.in/vtop/processViewTimeTable"
 vtop_process_timetable_url = f"https://vtop.vitap.ac.in/vtop/processViewTimeTable"
 vtop_process_attendance_url = f"{vtop_base_url}processViewStudentAttendance"
 vtop_process_attendance_detail_url = f"{vtop_base_url}processViewAttendanceDetail"

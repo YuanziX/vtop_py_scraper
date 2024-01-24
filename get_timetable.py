@@ -1,5 +1,7 @@
+import sys
 import aiohttp
 import pandas as pd
+from io import StringIO
 from bs4 import BeautifulSoup
 
 from constants.constants import vtop_process_timetable_url, current_sem_IDs
@@ -7,15 +9,15 @@ from models.period import Period
 from utils.payloads import get_timetable_payload
 
 
-async def _get_timetable_page(sess: aiohttp.ClientSession, username: str, semID: str) -> str:
-    async with sess.post(vtop_process_timetable_url, data=get_timetable_payload(username, semID)) as req:
+async def _get_timetable_page(sess: aiohttp.ClientSession, username: str, semID: str, csrf: str) -> str:
+    async with sess.post(vtop_process_timetable_url, data=get_timetable_payload(username, semID, csrf)) as req:
         return await req.text()
 
 
 def _get_course_code_with_name(soup: BeautifulSoup) -> dict:
     coursetable = soup.find('div', attrs={'id': 'studentDetailsList'})
     course_data = coursetable.find_all('td', attrs={
-                                       'style': 'padding: 3px; font-size: 12px; border-color: #3c8dbc;vertical-align: middle;text-align: left;'})
+                                       'style': 'padding: 3px; font-size: 12px; border-color: #b2b2b2;vertical-align: middle;'})
 
     course_data_dict = {}
 
@@ -73,10 +75,10 @@ def _parse_timetable(timetable_page: str):
     days_map = {"MON": "Monday", "TUE": 'Tuesday', "WED": 'Wednesday',
                 "THU": 'Thursday', "FRI": 'Friday', "SAT": "Saturday", "SUN": "Sunday"}
 
-    timetable_df = pd.read_html(timetable_page)[1]
+    timetable_df = pd.read_html(StringIO(timetable_page))[1]
 
     for row_idx in range(3, timetable_df.shape[0]):
-        is_theory = (timetable_df.iloc[row_idx, 1] == 'Theory')
+        is_theory = (timetable_df.iloc[row_idx, 1].lower() == 'theory')
         day = days_map.get(str(timetable_df.iloc[row_idx, 0]), "Sunday")
 
         for col_idx in range(2, timetable_df.shape[1]):
@@ -112,9 +114,9 @@ def _get_valid_timetable_data(timetable_page: str):
         return {}, False
 
 
-async def get_timetable_data(sess: aiohttp.ClientSession, username: str):
+async def get_timetable_data(sess: aiohttp.ClientSession, username: str, csrf_token: str):
     for id in current_sem_IDs:
-        timetable = _get_valid_timetable_data(await _get_timetable_page(sess, username, id))
+        timetable = _get_valid_timetable_data(await _get_timetable_page(sess, username, id, csrf_token))
         if timetable[1]:
             temp_tt = timetable[0]
             for key, periods in temp_tt.items():

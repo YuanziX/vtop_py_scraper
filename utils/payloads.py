@@ -14,8 +14,10 @@ def get_profile_payload(username: str, csrf: str) -> dict:
             '_csrf': csrf, 'nocache': '@(new Date().getTime()'}
 
 
-def get_timetable_payload(username: str, semID: str) -> dict:
-    return {'semesterSubId': semID, 'authorizedID': username, 'x': get_current_time()}
+def get_timetable_payload(username: str, semID: str, csrf: str) -> dict:
+    return {'_csrf': csrf, 'semesterSubId': semID,
+            'authorizedID': username, 'x': get_current_time()
+            }
 
 
 def get_attendance_payload(username: str, semID: str) -> dict:
