@@ -4,7 +4,7 @@ import pandas as pd
 from io import StringIO
 
 from utils.payloads import get_examSchedule_payload, get_goto_page_payload
-from constants.constants import vtop_examSchedule_url, vtop_doExamSchedule_url, current_sem_IDs
+from constants.constants import vtop_doExamSchedule_url, current_sem_IDs
 
 
 async def _get_examSchedule_page(sess: aiohttp.ClientSession, uname: str, semID: str, csrf: str) -> str:

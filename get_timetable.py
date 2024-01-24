@@ -1,4 +1,3 @@
-import sys
 import aiohttp
 import pandas as pd
 from io import StringIO
