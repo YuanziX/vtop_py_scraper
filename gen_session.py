@@ -12,9 +12,13 @@ async def gen_session(sess: aiohttp.ClientSession, username: str, password: str)
                 await sess.get("https://vtop.vitap.ac.in/vtop/init/page")
                 async with sess.get("https://vtop.vitap.ac.in/vtop/login") as req:
                     captcha = solve_base64(re.search(r';base64,(.+)"', await req.text()).group(1))
-                    print(captcha)
                     async with sess.post("https://vtop.vitap.ac.in/vtop/login", data={'_csrf': csrf_token, 'username': username, 'password': password, 'captchaStr': captcha}) as final:
-                        return re.search(r'var csrfValue = "(.*)";', await final.text()).group(1)
+                        csrf = re.search(r'var csrfValue = "(.*)";', await final.text()).group(1)
+                        if len(csrf) == 36:
+                            return csrf
+                        else:
+                            return await gen_session(sess, username, password)
+
     except:
-        await gen_session(sess, username, password)
+        return await gen_session(sess, username, password)
 
