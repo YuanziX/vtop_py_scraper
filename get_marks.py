@@ -1,13 +1,12 @@
 import aiohttp
-from string import capwords
 import pandas as pd
 
 from constants.constants import vtop_doMarks_view_url
 from utils.payloads import get_doMarks_view_payload
 
 
-async def _get_doMarks_view_page(sess: aiohttp.ClientSession, uname: str, semID) -> str:
-    async with sess.post(vtop_doMarks_view_url, data=get_doMarks_view_payload(uname, semID)) as req:
+async def _get_doMarks_view_page(sess: aiohttp.ClientSession, username: str, semID: str, csrf: str) -> str:
+    async with sess.post(vtop_doMarks_view_url, data=get_doMarks_view_payload(username, semID, csrf)) as req:
         return await req.text()
 
 
@@ -39,5 +38,5 @@ def _parse_marks(marks_page):
     return marks_data
 
 
-async def get_marks_data(sess: aiohttp.ClientSession, uname: str, semID: str):
-    return _parse_marks(await _get_doMarks_view_page(sess, uname, semID))
+async def get_marks_data(sess: aiohttp.ClientSession, username: str, semID: str, csrf: str):
+    return _parse_marks(await _get_doMarks_view_page(sess, username, semID, csrf))
