@@ -3,7 +3,6 @@ import aiohttp
 import pandas as pd
 from io import StringIO
 
-from get_sem_id import _get_sem_id
 from utils.payloads import get_examSchedule_payload
 from constants.constants import vtop_doExamSchedule_url
 
@@ -59,10 +58,8 @@ async def _parse_examSchedule(examSchedule_page: str):
 
 
 async def get_examSchedule_data(
-    sess: aiohttp.ClientSession, username: str, csrf: str
+    sess: aiohttp.ClientSession, username: str, semID: str, csrf: str
 ) -> dict:
-    examSchedule_page = await _get_examSchedule_page(
-        sess, username, await _get_sem_id(sess, username, csrf), csrf
-    )
+    examSchedule_page = await _get_examSchedule_page(sess, username, semID, csrf)
     examSchedule_data = await _parse_examSchedule(examSchedule_page)
     return examSchedule_data

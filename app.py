@@ -5,7 +5,7 @@ from gen_session import gen_session
 from get_profile import get_profile_data
 from get_attendance import get_attendance_data
 from get_timetable import get_timetable_data
-from get_sem_id import _get_all_sem_ids
+from get_sem_id import _get_all_sem_ids, _get_sem_id
 from get_marks import get_marks_data
 from get_grades import get_grades_data
 from get_exam_schedule import get_examSchedule_data
@@ -32,7 +32,9 @@ async def handle_request(data_func):
     async with ClientSession() as sess:
         csrf = await gen_session(sess, username, password)
         if csrf:
-            return await data_func(sess, username, csrf)
+            return await data_func(
+                sess, username, await _get_sem_id(sess, username, csrf), csrf
+            )
         else:
             abort(401)
 
@@ -78,13 +80,14 @@ async def all_data():
 
     async with ClientSession() as sess:
         csrf = await gen_session(sess, username, password)
+        semID = await _get_sem_id(sess, username, csrf)
         data = {
             "profile": await get_profile_data(sess, username, csrf),
-            "attendance": await get_attendance_data(sess, username, csrf),
-            "timetable": await get_timetable_data(sess, username, csrf),
+            "attendance": await get_attendance_data(sess, username, semID, csrf),
             "semIDs": await _get_all_sem_ids(sess, username, csrf),
             "grades": await get_grades_data(sess, username, csrf),
-            "examSchedule": await get_examSchedule_data(sess, username, csrf),
+            "examSchedule": await get_examSchedule_data(sess, username, semID, csrf),
+            "timetable": await get_timetable_data(sess, username, semID, csrf),
         }
 
         return data
@@ -100,9 +103,8 @@ async def marks():
 
     async with ClientSession() as sess:
         return await get_marks_data(
-                sess, username, semID, await gen_session(sess, username, password)
-            )
-        
+            sess, username, semID, await gen_session(sess, username, password)
+        )
 
 
 if __name__ == "__main__":

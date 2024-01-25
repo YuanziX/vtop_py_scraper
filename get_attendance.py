@@ -12,7 +12,6 @@ from utils.payloads import (
     get_attendance_detail_payload,
 )
 
-from get_sem_id import _get_sem_id
 
 async def _get_attendance_page(
     sess: aiohttp.ClientSession, username: str, semID: str, csrf: str
@@ -105,13 +104,13 @@ async def _parse_attendance(
     return attendance
 
 
-async def get_attendance_data(sess: aiohttp.ClientSession, username: str, csrf: str):
+async def get_attendance_data(
+    sess: aiohttp.ClientSession, username: str, semID: str, csrf: str
+):
     return await _parse_attendance(
-        await _get_attendance_page(
-            sess, username, await _get_sem_id(sess, username, csrf), csrf
-        ),
+        await _get_attendance_page(sess, username, semID, csrf),
         sess,
         username,
         csrf,
-        await _get_sem_id(sess, username, csrf),
+        semID,
     )

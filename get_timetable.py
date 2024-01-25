@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup
 from constants.constants import vtop_process_timetable_url
 from models.period import Period
 from utils.payloads import get_timetable_payload
-from get_sem_id import _get_sem_id
 
 
 async def _get_timetable_page(
@@ -69,6 +68,8 @@ def _get_lab_end_time(start_time: str):
 
 
 def _parse_timetable(timetable_page: str):
+    with open("timetable.html", "w") as f:
+        f.write(timetable_page)
     timetable = {
         "Tuesday": [],
         "Wednesday": [],
@@ -137,12 +138,11 @@ def _parse_timetable(timetable_page: str):
     return timetable
 
 
-async def get_timetable_data(sess: aiohttp.ClientSession, username: str, csrf: str):
-    timetable = _parse_timetable(
-        await _get_timetable_page(
-            sess, username, await _get_sem_id(sess, username, csrf), csrf
-        )
-    )
+async def get_timetable_data(
+    sess: aiohttp.ClientSession, username: str, semID: str, csrf: str
+):
+    print(username, semID, csrf)
+    timetable = _parse_timetable(await _get_timetable_page(sess, username, semID, csrf))
     for key, periods in timetable.items():
         timetable[key] = sorted(periods)
 
