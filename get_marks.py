@@ -1,5 +1,6 @@
 import aiohttp
 import pandas as pd
+from io import StringIO
 
 from constants.constants import vtop_doMarks_view_url
 from utils.payloads import get_doMarks_view_payload
@@ -12,7 +13,7 @@ async def _get_doMarks_view_page(sess: aiohttp.ClientSession, username: str, sem
 
 def _parse_marks(marks_page):
     try:
-        tables = pd.read_html(marks_page)
+        tables = pd.read_html(StringIO(marks_page))
     except ValueError:
         return {}
     
