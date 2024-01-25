@@ -5,10 +5,22 @@ from io import StringIO
 
 from constants.constants import (
     vtop_process_attendance_url,
+    vtop_attendance_semID_list_url,
     vtop_process_attendance_detail_url,
-    current_sem_IDs,
 )
-from utils.payloads import get_attendance_payload, get_attendance_detail_payload
+from utils.payloads import (
+    get_attendance_payload,
+    get_attendance_detail_payload,
+    get_attendance_semID_list_payload,
+)
+
+
+async def _get_sem_id(sess: aiohttp.ClientSession, username: str, csrf: str):
+    async with sess.post(
+        vtop_attendance_semID_list_url,
+        data=get_attendance_semID_list_payload(username, csrf),
+    ) as req:
+        return re.search('<option value="(A.*)"', await req.text()).group(1)
 
 
 async def _get_attendance_page(
@@ -102,35 +114,13 @@ async def _parse_attendance(
     return attendance
 
 
-async def _get_valid_attendance_data(
-    sess: aiohttp.ClientSession,
-    username: str,
-    csrf: str,
-    id: str,
-):
-    try:
-        return await _parse_attendance(
-            await _get_attendance_page(sess, username, id, csrf),
-            sess,
-            username,
-            csrf,
-            id,
-        ), True
-    except Exception as e:
-        print(e)
-        return [], False
-
-
 async def get_attendance_data(sess: aiohttp.ClientSession, username: str, csrf: str):
-    for id in current_sem_IDs:
-        attendance = await _get_valid_attendance_data(
-            sess,
-            username,
-            csrf,
-            id,
-        )
-        print(attendance)
-        if attendance[1]:
-            return attendance[0]
-    else:
-        return []
+    return await _parse_attendance(
+        await _get_attendance_page(
+            sess, username, await _get_sem_id(sess, username, csrf), csrf
+        ),
+        sess,
+        username,
+        csrf,
+        await _get_sem_id(sess, username, csrf),
+    )
