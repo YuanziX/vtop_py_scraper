@@ -16,16 +16,20 @@ def get_profile_payload(username: str, csrf: str) -> dict:
 
 def get_timetable_payload(username: str, semID: str, csrf: str) -> dict:
     return {'_csrf': csrf, 'semesterSubId': semID,
-            'authorizedID': username, 'x': get_current_time()
-            }
+            'authorizedID': username, 'x': get_current_time()}
 
 
-def get_attendance_payload(username: str, semID: str) -> dict:
-    return {'semesterSubId': semID, 'authorizedID': username, 'x': get_current_time()}
+def get_attendance_payload(username: str, semID: str, csrf: str) -> dict:
+    return get_timetable_payload(username, semID, csrf)
 
 
-def get_attendance_detail_payload(username: str, classID: str, slotName: str) -> dict:
-    return {'classId': classID, 'slotName': slotName, 'authorizedID': username, 'x': get_current_time()}
+def get_attendance_detail_payload(csrf: str, semID: str, username: str, courseID: str, courseType: str) -> dict:
+    return {
+        '_csrf': csrf, 'semesterSubId': semID,
+        'registerNumber': username, 'courseId': courseID,
+        'courseType': courseType, 'authorizedID': username,
+        'x': get_current_time(),
+        }
 
 
 def get_marks_view_sem_ids_payload(username: str) -> dict:
