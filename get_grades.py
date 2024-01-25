@@ -26,8 +26,8 @@ async def get_grades_data(sess: aiohttp.ClientSession, username: str, csrf: str)
 
     grade_data = {}
 
-    grade_data["creditsEarned"] = data_summary_table.iloc[0, 1]
-    grade_data["cgpa"] = data_summary_table.iloc[0, 2]
+    grade_data["creditsEarned"] = str(data_summary_table.iloc[0, 1])
+    grade_data["cgpa"] = str(data_summary_table.iloc[0, 2])
 
     grade_data["numOfEachGrade"] = {}
     grade_data["subjects"] = {}
