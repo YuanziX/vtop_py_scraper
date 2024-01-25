@@ -25,9 +25,9 @@ async def get_grades_data(sess: aiohttp.ClientSession, username: str, csrf: str)
 
     grade_data['numOfEachGrade'] = {}
     grade_data['subjects'] = {}
-    grade_data['numOfEachGrade']['S'] = data_summary_table.iloc[0, 3]
+    grade_data['numOfEachGrade']['S'] = str(data_summary_table.iloc[0, 3])
     for i in range (0, 6):
-        grade_data['numOfEachGrade'][chr(65 + i)] = data_summary_table.iloc[0, 4+i]
+        grade_data['numOfEachGrade'][chr(65 + i)] = str(data_summary_table.iloc[0, 4+i])
 
     for i in range (2, len(data_table)):
         grade_data['subjects'][data_table.iloc[i, 1]] = {
