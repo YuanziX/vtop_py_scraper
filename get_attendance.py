@@ -5,23 +5,14 @@ from io import StringIO
 
 from constants.constants import (
     vtop_process_attendance_url,
-    vtop_attendance_semID_list_url,
     vtop_process_attendance_detail_url,
 )
 from utils.payloads import (
     get_attendance_payload,
     get_attendance_detail_payload,
-    get_attendance_semID_list_payload,
 )
 
-
-async def _get_sem_id(sess: aiohttp.ClientSession, username: str, csrf: str):
-    async with sess.post(
-        vtop_attendance_semID_list_url,
-        data=get_attendance_semID_list_payload(username, csrf),
-    ) as req:
-        return re.search('<option value="(A.*)"', await req.text()).group(1)
-
+from get_sem_id import _get_sem_id
 
 async def _get_attendance_page(
     sess: aiohttp.ClientSession, username: str, semID: str, csrf: str
