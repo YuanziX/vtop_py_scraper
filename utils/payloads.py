@@ -57,8 +57,8 @@ def get_doMarks_view_payload(username: str, semID: str, csrf: str) -> dict:
     return {"authorizedID": username, "semesterSubId": semID, "_csrf": csrf}
 
 
-def get_gradeHistory_payload(username: str) -> dict:
-    return get_profile_payload(username)
+def get_gradeHistory_payload(username: str, csrf: str) -> dict:
+    return get_profile_payload(username, csrf)
 
 
 def get_examSchedule_payload(username: str, semID: str, csrf: str) -> dict:
