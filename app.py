@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, abort
+from flask import Flask, request, abort
 from aiohttp import ClientSession
 
 from gen_session import gen_session
@@ -65,8 +65,8 @@ async def verify_creds():
     basic_creds_check(username, password)
 
     async with ClientSession() as sess:
-        if await gen_session(sess, username, password):
-            return jsonify({"isValid": True})
+        if await gen_session(sess, username, password) != 0:
+            return
         else:
             abort(401)
 

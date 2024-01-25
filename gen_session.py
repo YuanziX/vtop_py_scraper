@@ -34,7 +34,9 @@ async def gen_session(sess: aiohttp.ClientSession, username: str, password: str)
                         csrf = re.search(
                             r'var csrfValue = "(.*)";', await final.text()
                         ).group(1)
-                        if len(csrf) == 36:
+                        if "Invalid" in await final.text():
+                            return 0
+                        elif len(csrf) == 36:
                             return csrf
                         else:
                             return await gen_session(sess, username, password)
