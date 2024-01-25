@@ -3,68 +3,66 @@ import aiohttp
 import pandas as pd
 from io import StringIO
 
-from utils.payloads import get_examSchedule_payload, get_goto_page_payload
-from constants.constants import vtop_doExamSchedule_url, current_sem_IDs
+from get_sem_id import _get_sem_id
+from utils.payloads import get_examSchedule_payload
+from constants.constants import vtop_doExamSchedule_url
 
 
-async def _get_examSchedule_page(sess: aiohttp.ClientSession, uname: str, semID: str, csrf: str) -> str:
-    async with sess.post(vtop_doExamSchedule_url, data=get_examSchedule_payload(uname, semID, csrf)) as req:
-        if (req.status != 200):
-            return "", False
-        return await req.text(), True
+async def _get_examSchedule_page(
+    sess: aiohttp.ClientSession, username: str, semID: str, csrf: str
+) -> str:
+    async with sess.post(
+        vtop_doExamSchedule_url, data=get_examSchedule_payload(username, semID, csrf)
+    ) as req:
+        return await req.text()
+
 
 def _return_dash_if_not_str(value):
-    if type(value) is str:
+    if isinstance(value, str):
         return value
     else:
-        return '-'
+        return "-"
 
 
 async def _parse_examSchedule(examSchedule_page: str):
-    examSchedule_table = pd.read_html(StringIO(examSchedule_page))[0]
+    try:
+        examSchedule_table = pd.read_html(StringIO(examSchedule_page))[0]
+    except ValueError:
+        return {}
     examSchedule_data = {}
 
-    current_exam = ''
+    current_exam = ""
     for index, row in examSchedule_table.iterrows():
         if index == 0:
             continue
-        if re.search('\D', row[0]):
+        if re.search("\D", row[0]):
             current_exam = row[0]
             examSchedule_data[current_exam] = {}
         else:
             examSchedule_data[current_exam][row[1]] = {
-                'name': row[2],
-                'type': row[3],
-                'classID': row[4],
-                'slot': row[5],
-                'date': _return_dash_if_not_str(row[6]),
-                'session': _return_dash_if_not_str(row[7]),
-                'reportingTime': _return_dash_if_not_str(row[8]),
-                'duration': _return_dash_if_not_str(row[9]),
-                'venue': row[10].split('-')[0],
-                'roomNo': row[10].split('-')[1],
-                'seatLocation': row[11],
-                'seatNo': row[12],
+                "name": row[2],
+                "type": row[3],
+                "classID": row[4],
+                "slot": row[5],
+                "date": _return_dash_if_not_str(row[6]),
+                "session": _return_dash_if_not_str(row[7]),
+                "reportingTime": _return_dash_if_not_str(row[8]),
+                "duration": _return_dash_if_not_str(row[9]),
+                "venue": row[10].split("-")[0],
+                "roomNo": row[10].split("-")[1],
+                "seatLocation": row[11],
+                "seatNo": row[12],
             }
 
     examSchedule_data.pop("S.No.")
     return examSchedule_data
 
-async def _get_valid_examSchedule_data(examSchedule_page: str):
-    try:
-        return await _parse_examSchedule(examSchedule_page), True
-    except:
-        return {}, False
 
-
-async def get_examSchedule_data(sess: aiohttp.ClientSession, uname: str, csrf: str) -> dict:
-    for semID in current_sem_IDs:
-        receivedData = False
-        while (receivedData != True):
-            examSchedule_page = await _get_examSchedule_page(sess, uname, semID, csrf)
-            receivedData = examSchedule_page[1]
-        examSchedule_data = await _get_valid_examSchedule_data(examSchedule_page[0])
-        if examSchedule_data[1]:
-            return examSchedule_data[0]
-    else:
-        return {}
+async def get_examSchedule_data(
+    sess: aiohttp.ClientSession, username: str, csrf: str
+) -> dict:
+    examSchedule_page = await _get_examSchedule_page(
+        sess, username, await _get_sem_id(sess, username, csrf), csrf
+    )
+    examSchedule_data = await _parse_examSchedule(examSchedule_page)
+    return examSchedule_data
