@@ -5,7 +5,7 @@ from gen_session import gen_session
 from get_profile import get_profile_data
 from get_attendance import get_attendance_data
 from get_timetable import get_timetable_data
-from get_sem_ids import get_sem_ids
+from get_sem_id import _get_all_sem_ids
 from get_marks import get_marks_data
 from get_grades import get_grades_data
 from get_exam_schedule import get_examSchedule_data
@@ -14,97 +14,96 @@ app = Flask(__name__)
 
 
 def basic_creds_check(username: str, password: str):
-    if username == '' or username == None or password == '' or password == None:
+    if username == "" or username is None or password == "" or password is None:
         abort(401)
 
 
-@app.route('/')
+@app.route("/")
 def root():
-    return 'VTOP-AP API'
+    return "VTOP-AP API"
 
 
 async def handle_request(data_func):
-    username = request.form.get('username')
-    password = request.form.get('password')
+    username = request.form.get("username")
+    password = request.form.get("password")
 
     basic_creds_check(username, password)
 
     async with ClientSession() as sess:
-        if await gen_session(sess, username, password):
-            return jsonify(await data_func(sess, username))
+        csrf = await gen_session(sess, username, password)
+        if csrf:
+            return await data_func(sess, username, csrf)
         else:
             abort(401)
 
 
-@app.route('/api/profile', methods=['POST'])
-@app.route('/api/attendance', methods=['POST'])
-@app.route('/api/timetable', methods=['POST'])
-@app.route('/api/semIDs', methods=['POST'])
-@app.route('/api/grades', methods=['POST'])
-@app.route('/api/examSchedule', methods=['POST'])
+@app.route("/api/profile", methods=["POST"])
+@app.route("/api/attendance", methods=["POST"])
+@app.route("/api/timetable", methods=["POST"])
+@app.route("/api/semIDs", methods=["POST"])
+@app.route("/api/grades", methods=["POST"])
+@app.route("/api/examSchedule", methods=["POST"])
 async def handle_data():
     data_func = {
-        '/api/profile': get_profile_data,
-        '/api/attendance': get_attendance_data,
-        '/api/timetable': get_timetable_data,
-        '/api/semIDs': get_sem_ids,
-        '/api/grades': get_grades_data,
-        '/api/examSchedule': get_examSchedule_data
+        "/api/profile": get_profile_data,
+        "/api/attendance": get_attendance_data,
+        "/api/timetable": get_timetable_data,
+        "/api/semIDs": _get_all_sem_ids,
+        "/api/grades": get_grades_data,
+        "/api/examSchedule": get_examSchedule_data,
     }
     return await handle_request(data_func[request.path])
 
 
-@app.route('/api/verify', methods=['POST'])
+@app.route("/api/verify", methods=["POST"])
 async def verify_creds():
-    username = request.form.get('username')
-    password = request.form.get('password')
+    username = request.form.get("username")
+    password = request.form.get("password")
 
     basic_creds_check(username, password)
 
     async with ClientSession() as sess:
         if await gen_session(sess, username, password):
-            return jsonify({'isValid': True})
+            return jsonify({"isValid": True})
         else:
             abort(401)
 
 
-@app.route('/api/all', methods=['POST'])
+@app.route("/api/all", methods=["POST"])
 async def all_data():
-    username = request.form.get('username')
-    password = request.form.get('password')
+    username = request.form.get("username")
+    password = request.form.get("password")
 
     basic_creds_check(username, password)
 
     async with ClientSession() as sess:
-        if await gen_session(sess, username, password):
-            data = {
-                'profile': await get_profile_data(sess, username),
-                'attendance': await get_attendance_data(sess, username),
-                'timetable': await get_timetable_data(sess, username),
-                'semIDs': await get_sem_ids(sess, username),
-                'grades': await get_grades_data(sess, username),
-                'examSchedule': await get_examSchedule_data(sess, username),
-            }
+        csrf = await gen_session(sess, username, password)
+        data = {
+            "profile": await get_profile_data(sess, username, csrf),
+            "attendance": await get_attendance_data(sess, username, csrf),
+            "timetable": await get_timetable_data(sess, username, csrf),
+            "semIDs": await _get_all_sem_ids(sess, username, csrf),
+            "grades": await get_grades_data(sess, username, csrf),
+            "examSchedule": await get_examSchedule_data(sess, username, csrf),
+        }
 
-            return jsonify(data)
-        else:
-            abort(401)
+        return data
 
 
-@app.route('/api/marks', methods=['POST'])
+@app.route("/api/marks", methods=["POST"])
 async def marks():
-    username = request.form.get('username')
-    password = request.form.get('password')
-    semID = request.form.get('semID')
+    username = request.form.get("username")
+    password = request.form.get("password")
+    semID = request.form.get("semID")
 
     basic_creds_check(username, password)
 
     async with ClientSession() as sess:
-        if await gen_session(sess, username, password):
-            return jsonify(await get_marks_data(sess, username, semID))
-        else:
-            abort(401)
+        return await get_marks_data(
+                sess, username, semID, await gen_session(sess, username, password)
+            )
+        
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host="0.0.0.0")
