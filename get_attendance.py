@@ -52,7 +52,7 @@ def _parse_attendance_detail(attendance_detail_page: str):
     attendance_detail = {}
 
     for index, row in attendance_detail_table.iterrows():
-        attendance_detail[row["Sl.No."]] = {
+        attendance_detail[str(row["Sl.No."])] = {
             "status": row["Status"],
             "date": row["Date"],
             "time": row["Day / Time"],
@@ -86,9 +86,9 @@ async def _parse_attendance(
                 "name": row["Course Detail"].split("-")[1].strip(),
                 "courseType": row["Course Detail"].split("-")[2].strip(),
                 "slot": slot,
-                "totalClasses": row["Total Classes"],
-                "attendedClasses": row["Attended Classes"],
-                "attendancePercentage": row["Attendance Percentage"],
+                "totalClasses": str(row["Total Classes"]),
+                "attendedClasses": str(row["Attended Classes"]),
+                "attendancePercentage": row["Attendance Percentage"][:-1],
                 "attendanceDetail": _parse_attendance_detail(
                     await _get_attendance_detail_page(
                         sess,
