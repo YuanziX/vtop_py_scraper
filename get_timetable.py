@@ -30,7 +30,7 @@ def _get_course_code_with_name(soup: BeautifulSoup) -> dict:
 
     for data_cell in course_data:
         data = data_cell.text.split("-")
-        course_data_dict[data[0].strip()] = data[1].strip()
+        course_data_dict[data[0].strip()] = data[1].split("\n")[0].strip()
 
     return course_data_dict
 
@@ -39,7 +39,7 @@ def _parse_theory_vals(s):
     temp_arr = str(s).strip().split("-")
     slot = temp_arr[0]
     course_code = temp_arr[1]
-    cls = f"{temp_arr[4]}{temp_arr[5] if len(temp_arr) == 6 else ''}-{temp_arr[3]}"
+    cls = "-".join(temp_arr[3:len(temp_arr) - 1])
 
     return slot, course_code, cls
 
@@ -54,7 +54,7 @@ def _parse_lab_vals(s):
     temp_arr = str(s).strip().split("-")
     slot = _get_lab_slot(temp_arr[0])
     course_code = temp_arr[1]
-    cls = "-".join(temp_arr[3:])
+    cls = "-".join(temp_arr[3:len(temp_arr) - 1])
 
     return slot, course_code, cls
 
@@ -68,8 +68,6 @@ def _get_lab_end_time(start_time: str):
 
 
 def _parse_timetable(timetable_page: str):
-    with open("timetable.html", "w") as f:
-        f.write(timetable_page)
     timetable = {
         "Tuesday": [],
         "Wednesday": [],
