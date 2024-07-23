@@ -8,7 +8,9 @@ class Period:
         self.endTime = endTime
 
     def __eq__(self, other):
-        return self.slot == other.slot and self.code == other.code
+        return (
+            self.slot == other.slot or self.slot[0] == other.slot[0] == "L"
+        ) and self.code == other.code
 
     def __lt__(self, other):
         return self.startTime < other.startTime
@@ -20,7 +22,7 @@ class Period:
             "code": self.code,
             "location": self.location,
             "startTime": self.startTime,
-            "endTime": self.endTime
+            "endTime": self.endTime,
         }
 
     def __repr__(self) -> str:
