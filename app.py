@@ -43,7 +43,6 @@ async def handle_request(data_func):
 @app.route("/api/attendance", methods=["POST"])
 @app.route("/api/timetable", methods=["POST"])
 @app.route("/api/semIDs", methods=["POST"])
-@app.route("/api/grades", methods=["POST"])
 @app.route("/api/examSchedule", methods=["POST"])
 async def handle_data():
     data_func = {
@@ -51,7 +50,6 @@ async def handle_data():
         "/api/attendance": get_attendance_data,
         "/api/timetable": get_timetable_data,
         "/api/semIDs": _get_all_sem_ids,
-        "/api/grades": get_grades_data,
         "/api/examSchedule": get_examSchedule_data,
     }
     return await handle_request(data_func[request.path])
@@ -104,6 +102,19 @@ async def marks():
     async with ClientSession() as sess:
         return await get_marks_data(
             sess, username, semID, await gen_session(sess, username, password)
+        )
+
+
+@app.route("/api/grades", methods=["POST"])
+async def grades():
+    username = request.form.get("username")
+    password = request.form.get("password")
+
+    basic_creds_check(username, password)
+
+    async with ClientSession() as sess:
+        return await get_grades_data(
+            sess, username, await gen_session(sess, username, password)
         )
 
 
