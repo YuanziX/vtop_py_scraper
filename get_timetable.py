@@ -39,7 +39,7 @@ def _parse_theory_vals(s):
     temp_arr = str(s).strip().split("-")
     slot = temp_arr[0]
     course_code = temp_arr[1]
-    cls = "-".join(temp_arr[3:len(temp_arr) - 1])
+    cls = "-".join(temp_arr[3 : len(temp_arr) - 1])
 
     return slot, course_code, cls
 
@@ -54,7 +54,7 @@ def _parse_lab_vals(s):
     temp_arr = str(s).strip().split("-")
     slot = _get_lab_slot(temp_arr[0])
     course_code = temp_arr[1]
-    cls = "-".join(temp_arr[3:len(temp_arr) - 1])
+    cls = "-".join(temp_arr[3 : len(temp_arr) - 1])
 
     return slot, course_code, cls
 
@@ -139,7 +139,6 @@ def _parse_timetable(timetable_page: str):
 async def get_timetable_data(
     sess: aiohttp.ClientSession, username: str, semID: str, csrf: str
 ):
-    print(username, semID, csrf)
     timetable = _parse_timetable(await _get_timetable_page(sess, username, semID, csrf))
     for key, periods in timetable.items():
         timetable[key] = sorted(periods)

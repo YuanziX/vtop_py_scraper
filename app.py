@@ -23,7 +23,7 @@ def root():
     return "VTOP-AP API"
 
 
-async def handle_request(data_func):
+async def handle_request(data_func, num_parameters):
     username = request.form.get("username")
     password = request.form.get("password")
 
@@ -32,25 +32,38 @@ async def handle_request(data_func):
     async with ClientSession() as sess:
         csrf = await gen_session(sess, username, password)
         if csrf:
-            return await data_func(
-                sess, username, await _get_sem_id(sess, username, csrf), csrf
-            )
+            if num_parameters == 3:
+                return await data_func(sess, username, csrf)
+            else:
+                return await data_func(
+                    sess, username, await _get_sem_id(sess, username, csrf), csrf
+                )
         else:
             abort(401)
 
 
 @app.route("/api/attendance", methods=["POST"])
 @app.route("/api/timetable", methods=["POST"])
-@app.route("/api/semIDs", methods=["POST"])
 @app.route("/api/examSchedule", methods=["POST"])
-async def handle_data():
+async def handle_4param_data_functions():
     data_func = {
         "/api/attendance": get_attendance_data,
         "/api/timetable": get_timetable_data,
-        "/api/semIDs": _get_all_sem_ids,
         "/api/examSchedule": get_examSchedule_data,
     }
-    return await handle_request(data_func[request.path])
+    return await handle_request(data_func[request.path], 4)
+
+
+@app.route("/api/grades", methods=["POST"])
+@app.route("/api/profile", methods=["POST"])
+@app.route("/api/semIDs", methods=["POST"])
+async def handle_3param_data_functinos():
+    data_func = {
+        "/api/grades": get_grades_data,
+        "/api/profile": get_profile_data,
+        "/api/semIDs": _get_all_sem_ids,
+    }
+    return await handle_request(data_func[request.path], 3)
 
 
 @app.route("/api/verify", methods=["POST"])
@@ -100,32 +113,6 @@ async def marks():
     async with ClientSession() as sess:
         return await get_marks_data(
             sess, username, semID, await gen_session(sess, username, password)
-        )
-
-
-@app.route("/api/grades", methods=["POST"])
-async def grades():
-    username = request.form.get("username")
-    password = request.form.get("password")
-
-    basic_creds_check(username, password)
-
-    async with ClientSession() as sess:
-        return await get_grades_data(
-            sess, username, await gen_session(sess, username, password)
-        )
-
-
-@app.route("/api/profile", methods=["POST"])
-async def profile():
-    username = request.form.get("username")
-    password = request.form.get("password")
-
-    basic_creds_check(username, password)
-
-    async with ClientSession() as sess:
-        return await get_profile_data(
-            sess, username, await gen_session(sess, username, password)
         )
 
 
