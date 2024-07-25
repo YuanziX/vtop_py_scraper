@@ -39,14 +39,12 @@ async def handle_request(data_func):
             abort(401)
 
 
-@app.route("/api/profile", methods=["POST"])
 @app.route("/api/attendance", methods=["POST"])
 @app.route("/api/timetable", methods=["POST"])
 @app.route("/api/semIDs", methods=["POST"])
 @app.route("/api/examSchedule", methods=["POST"])
 async def handle_data():
     data_func = {
-        "/api/profile": get_profile_data,
         "/api/attendance": get_attendance_data,
         "/api/timetable": get_timetable_data,
         "/api/semIDs": _get_all_sem_ids,
@@ -114,6 +112,19 @@ async def grades():
 
     async with ClientSession() as sess:
         return await get_grades_data(
+            sess, username, await gen_session(sess, username, password)
+        )
+
+
+@app.route("/api/profile", methods=["POST"])
+async def profile():
+    username = request.form.get("username")
+    password = request.form.get("password")
+
+    basic_creds_check(username, password)
+
+    async with ClientSession() as sess:
+        return await get_profile_data(
             sess, username, await gen_session(sess, username, password)
         )
 
