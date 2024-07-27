@@ -1,4 +1,4 @@
-from flask import Flask, request, abort
+from flask import Flask, request, abort, jsonify
 from aiohttp import ClientSession
 
 from gen_session import gen_session
@@ -74,10 +74,11 @@ async def verify_creds():
     basic_creds_check(username, password)
 
     async with ClientSession() as sess:
-        if await gen_session(sess, username, password) != 0:
-            return
-        else:
+        session_result = await gen_session(sess, username, password)
+        if session_result == 0:
             abort(401)
+        else:
+            return jsonify({"csrf_token": session_result}), 200
 
 
 @app.route("/api/all", methods=["POST"])
