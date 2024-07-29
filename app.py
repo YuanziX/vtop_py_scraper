@@ -1,6 +1,7 @@
+import os
+import json
 from flask import Flask, request, abort, jsonify
 from aiohttp import ClientSession
-
 from gen_session import gen_session
 from get_profile import get_profile_data
 from get_attendance import get_attendance_data
@@ -11,11 +12,35 @@ from get_grades import get_grades_data
 from get_exam_schedule import get_examSchedule_data
 
 app = Flask(__name__)
+request_log = {}
+
+# Hardcoded path to the request_log.json file in the app's directory
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+REQUEST_LOG_PATH = os.path.join(APP_DIR, "request_log.json")
+
+
+def load_request_log():
+    global request_log
+    try:
+        with open(REQUEST_LOG_PATH, "r") as f:
+            request_log = json.load(f)
+    except FileNotFoundError:
+        request_log = {}
 
 
 def basic_creds_check(username: str, password: str):
     if username == "" or username is None or password == "" or password is None:
         abort(401)
+
+
+def log_request(username: str):
+    if username in request_log:
+        request_log[username] += 1
+    else:
+        request_log[username] = 1
+
+    with open(REQUEST_LOG_PATH, "w") as f:
+        json.dump(request_log, f)
 
 
 @app.route("/")
@@ -28,6 +53,7 @@ async def handle_request(data_func, num_parameters):
     password = request.form.get("password")
 
     basic_creds_check(username, password)
+    log_request(username)
 
     async with ClientSession() as sess:
         csrf = await gen_session(sess, username, password)
@@ -72,6 +98,7 @@ async def verify_creds():
     password = request.form.get("password")
 
     basic_creds_check(username, password)
+    log_request(username)
 
     async with ClientSession() as sess:
         session_result = await gen_session(sess, username, password)
@@ -87,6 +114,7 @@ async def all_data():
     password = request.form.get("password")
 
     basic_creds_check(username, password)
+    log_request(username)
 
     async with ClientSession() as sess:
         csrf = await gen_session(sess, username, password)
@@ -110,6 +138,7 @@ async def marks():
     semID = request.form.get("semID")
 
     basic_creds_check(username, password)
+    log_request(username)
 
     async with ClientSession() as sess:
         return await get_marks_data(
@@ -118,4 +147,5 @@ async def marks():
 
 
 if __name__ == "__main__":
+    load_request_log()
     app.run(debug=True, host="0.0.0.0")
