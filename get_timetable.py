@@ -1,3 +1,4 @@
+import re
 import aiohttp
 import pandas as pd
 from io import StringIO
@@ -26,11 +27,17 @@ def _get_course_code_with_name(soup: BeautifulSoup) -> dict:
         },
     )
 
+    class_ids = coursetable.find_all("p", string=re.compile(r"AP\d+"))
+
     course_data_dict = {}
 
-    for data_cell in course_data:
+    for data_cell, class_id in zip(course_data, class_ids):
         data = data_cell.text.split("-")
-        course_data_dict[data[0].strip()] = data[1].split("\n")[0].strip()
+        # code: [id, name]
+        course_data_dict[data[0].strip()] = [
+            data[1].split("\n")[0].strip(),
+            class_id.text,
+        ]
 
     return course_data_dict
 
@@ -109,8 +116,9 @@ def _parse_timetable(timetable_page: str):
                     start_time = timetable_df.iloc[0, col_idx]
 
                     cell = Period(
+                        class_id=course_code_dict[code][1],
                         slot=slot,
-                        courseName=course_code_dict[code],
+                        courseName=course_code_dict[code][0],
                         code=code,
                         location=location,
                         startTime=start_time,
@@ -122,8 +130,9 @@ def _parse_timetable(timetable_page: str):
                     start_time = timetable_df.iloc[0, col_idx]
 
                     cell = Period(
+                        class_id=course_code_dict[code][1],
                         slot=slot,
-                        courseName=course_code_dict[code],
+                        courseName=course_code_dict[code][0],
                         code=code,
                         location=location,
                         startTime=start_time,

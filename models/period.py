@@ -1,5 +1,6 @@
 class Period:
-    def __init__(self, slot, courseName, code, location, startTime, endTime):
+    def __init__(self, class_id, slot, courseName, code, location, startTime, endTime):
+        self.class_id = class_id
         self.slot = slot
         self.courseName = courseName
         self.code = code
@@ -17,6 +18,7 @@ class Period:
 
     def to_dict(self):
         return {
+            "classId": self.class_id,
             "slot": self.slot,
             "courseName": self.courseName,
             "code": self.code,
