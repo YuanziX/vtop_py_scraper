@@ -1,6 +1,7 @@
 import aiohttp
 from constants.constants import user_agent_header
 from utils.captcha_solver import solve_base64
+from utils.payloads import get_login_payload
 import re
 
 
@@ -24,12 +25,12 @@ async def gen_session(sess: aiohttp.ClientSession, username: str, password: str)
                     )
                     async with sess.post(
                         "https://vtop.vitap.ac.in/vtop/login",
-                        data={
-                            "_csrf": csrf_token,
-                            "username": username,
-                            "password": password,
-                            "captchaStr": captcha,
-                        },
+                        data=get_login_payload(
+                            csrf_token,
+                            username,
+                            password,
+                            captcha,
+                        ),
                     ) as final:
                         csrf = re.search(
                             r'var csrfValue = "(.*)";', await final.text()

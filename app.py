@@ -28,7 +28,7 @@ def load_request_log():
         request_log = {}
 
 
-def basic_creds_check(username: str, password: str):
+def basic_creds_check(username: str | None, password: str | None):
     if username == "" or username is None or password == "" or password is None:
         abort(401)
 

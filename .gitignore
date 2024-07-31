@@ -3,3 +3,4 @@ constants/priv_constants.py
 __pycache__/
 venv/
 test.py
+.vscode
