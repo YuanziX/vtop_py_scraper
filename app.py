@@ -1,6 +1,7 @@
 import os
 import json
-from flask import Flask, request, abort, jsonify
+from fastapi import FastAPI, Request, HTTPException, status, Form
+from fastapi.responses import JSONResponse
 from aiohttp import ClientSession
 from gen_session import gen_session
 from get_profile import get_profile_data
@@ -11,7 +12,7 @@ from get_marks import get_marks_data
 from get_grades import get_grades_data
 from get_exam_schedule import get_examSchedule_data
 
-app = Flask(__name__)
+app = FastAPI()
 request_log = {}
 
 # Hardcoded path to the request_log.json file in the app's directory
@@ -29,8 +30,8 @@ def load_request_log():
 
 
 def basic_creds_check(username: str | None, password: str | None):
-    if username == "" or username is None or password == "" or password is None:
-        abort(401)
+    if not username or not password:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 def log_request(username: str):
@@ -43,15 +44,12 @@ def log_request(username: str):
         json.dump(request_log, f)
 
 
-@app.route("/")
-def root():
-    return "VTOP-AP API"
+@app.get("/")
+async def root():
+    return {"message": "VTOP-AP API"}
 
 
-async def handle_request(data_func, num_parameters):
-    username = request.form.get("username")
-    password = request.form.get("password")
-
+async def handle_request(data_func, num_parameters, username, password):
     basic_creds_check(username, password)
     log_request(username)
 
@@ -65,54 +63,54 @@ async def handle_request(data_func, num_parameters):
                     sess, username, await _get_sem_id(sess, username, csrf), csrf
                 )
         else:
-            abort(401)
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
-@app.route("/api/attendance", methods=["POST"])
-@app.route("/api/timetable", methods=["POST"])
-@app.route("/api/examSchedule", methods=["POST"])
-async def handle_4param_data_functions():
+@app.post("/api/attendance")
+@app.post("/api/timetable")
+@app.post("/api/examSchedule")
+async def handle_4param_data_functions(
+    request: Request, username: str = Form(...), password: str = Form(...)
+):
     data_func = {
         "/api/attendance": get_attendance_data,
         "/api/timetable": get_timetable_data,
         "/api/examSchedule": get_examSchedule_data,
     }
-    return await handle_request(data_func[request.path], 4)
+    return await handle_request(data_func[request.url.path], 4, username, password)
 
 
-@app.route("/api/grades", methods=["POST"])
-@app.route("/api/profile", methods=["POST"])
-@app.route("/api/semIDs", methods=["POST"])
-async def handle_3param_data_functinos():
+@app.post("/api/grades")
+@app.post("/api/profile")
+@app.post("/api/semIDs")
+async def handle_3param_data_functions(
+    request: Request, username: str = Form(...), password: str = Form(...)
+):
     data_func = {
         "/api/grades": get_grades_data,
         "/api/profile": get_profile_data,
         "/api/semIDs": _get_all_sem_ids,
     }
-    return await handle_request(data_func[request.path], 3)
+    return await handle_request(data_func[request.url.path], 3, username, password)
 
 
-@app.route("/api/verify", methods=["POST"])
-async def verify_creds():
-    username = request.form.get("username")
-    password = request.form.get("password")
-
+@app.post("/api/verify")
+async def verify_creds(username: str = Form(...), password: str = Form(...)):
     basic_creds_check(username, password)
     log_request(username)
 
     async with ClientSession() as sess:
         session_result = await gen_session(sess, username, password)
         if session_result == 0:
-            abort(401)
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
         else:
-            return jsonify({"csrf_token": session_result}), 200
+            return JSONResponse(
+                content={"csrf_token": session_result}, status_code=status.HTTP_200_OK
+            )
 
 
-@app.route("/api/all", methods=["POST"])
-async def all_data():
-    username = request.form.get("username")
-    password = request.form.get("password")
-
+@app.post("/api/all")
+async def all_data(username: str = Form(...), password: str = Form(...)):
     basic_creds_check(username, password)
     log_request(username)
 
@@ -131,12 +129,10 @@ async def all_data():
         return data
 
 
-@app.route("/api/marks", methods=["POST"])
-async def marks():
-    username = request.form.get("username")
-    password = request.form.get("password")
-    semID = request.form.get("semID")
-
+@app.post("/api/marks")
+async def marks(
+    username: str = Form(...), password: str = Form(...), semID: str = Form(...)
+):
     basic_creds_check(username, password)
     log_request(username)
 
@@ -148,4 +144,6 @@ async def marks():
 
 if __name__ == "__main__":
     load_request_log()
-    app.run(debug=True, host="0.0.0.0")
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)
