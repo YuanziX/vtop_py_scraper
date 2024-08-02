@@ -18,7 +18,7 @@ async def _get_timetable_page(
         return await req.text()
 
 
-def _get_course_code_with_name(soup: BeautifulSoup) -> dict:
+def _get_course_details(soup: BeautifulSoup) -> dict:
     coursetable = soup.find("div", attrs={"id": "studentDetailsList"})
     course_data = coursetable.find_all(
         "td",
@@ -42,28 +42,12 @@ def _get_course_code_with_name(soup: BeautifulSoup) -> dict:
     return course_data_dict
 
 
-def _parse_theory_vals(s):
+def _parse_course_vals(s):
     temp_arr = str(s).strip().split("-")
-    slot = temp_arr[0]
     course_code = temp_arr[1]
     cls = "-".join(temp_arr[3 : len(temp_arr) - 1])
 
-    return slot, course_code, cls
-
-
-def _get_lab_slot(slot: str) -> str:
-    num = int(slot.replace("L", ""))
-
-    return f"L{num}+{num + 1}" if num % 2 else f"L{num - 1}+{num}"
-
-
-def _parse_lab_vals(s):
-    temp_arr = str(s).strip().split("-")
-    slot = _get_lab_slot(temp_arr[0])
-    course_code = temp_arr[1]
-    cls = "-".join(temp_arr[3 : len(temp_arr) - 1])
-
-    return slot, course_code, cls
+    return course_code, cls
 
 
 def _get_theory_end_time(start_time: str):
@@ -85,7 +69,7 @@ def _parse_timetable(timetable_page: str):
 
     soup = BeautifulSoup(timetable_page, "lxml")
 
-    course_code_dict = _get_course_code_with_name(soup)
+    course_code_dict = _get_course_details(soup)
     days_map = {
         "MON": "Monday",
         "TUE": "Tuesday",
@@ -96,7 +80,9 @@ def _parse_timetable(timetable_page: str):
         "SUN": "Sunday",
     }
 
-    timetable_df = pd.read_html(StringIO(timetable_page))[1]
+    dataframes = pd.read_html(StringIO(timetable_page))
+    course_details = dataframes[0]
+    timetable_df = dataframes[1]
 
     for row_idx in range(3, timetable_df.shape[0]):
         is_theory = timetable_df.iloc[row_idx, 1].lower() == "theory"
@@ -111,13 +97,19 @@ def _parse_timetable(timetable_page: str):
                 or all([char == "-" for char in cell_str])
             )
             if not is_cell_empty:
+                code, location = _parse_course_vals(cell_str)
+                class_id = course_code_dict[code][1]
+
                 if is_theory:
-                    slot, code, location = _parse_theory_vals(cell_str)
                     start_time = timetable_df.iloc[0, col_idx]
 
                     cell = Period(
-                        class_id=course_code_dict[code][1],
-                        slot=slot,
+                        class_id=class_id,
+                        slot=course_details[course_details["Class Nbr"] == class_id][
+                            "Slot - Venue"
+                        ]
+                        .iloc[0]
+                        .split(" - ")[0],
                         courseName=course_code_dict[code][0],
                         code=code,
                         location=location,
@@ -126,12 +118,15 @@ def _parse_timetable(timetable_page: str):
                     )
 
                 else:
-                    slot, code, location = _parse_lab_vals(cell_str)
                     start_time = timetable_df.iloc[0, col_idx]
 
                     cell = Period(
-                        class_id=course_code_dict[code][1],
-                        slot=slot,
+                        class_id=class_id,
+                        slot=course_details[course_details["Class Nbr"] == class_id][
+                            "Slot - Venue"
+                        ]
+                        .iloc[0]
+                        .split(" - ")[0],
                         courseName=course_code_dict[code][0],
                         code=code,
                         location=location,
