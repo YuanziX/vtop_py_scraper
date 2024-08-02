@@ -42,20 +42,19 @@ def _get_course_details(soup: BeautifulSoup) -> dict:
     return course_data_dict
 
 
-def _parse_course_vals(s):
-    temp_arr = str(s).strip().split("-")
+def _parse_course_vals(cell_str: str):
+    temp_arr = str(cell_str).strip().split("-")
     course_code = temp_arr[1]
     cls = "-".join(temp_arr[3 : len(temp_arr) - 1])
 
     return course_code, cls
 
 
-def _get_theory_end_time(start_time: str):
-    return f'{start_time.split(":")[0]}:50'
-
-
-def _get_lab_end_time(start_time: str):
-    return f'{int(start_time.split(":")[0]) + 1}:40'
+def _get_end_time(start_time: str, is_theory: bool = True):
+    if is_theory:
+        return f'{start_time.split(":")[0]}:50'
+    else:
+        return f'{int(start_time.split(":")[0]) + 1}:40'
 
 
 def _parse_timetable(timetable_page: str):
@@ -100,39 +99,21 @@ def _parse_timetable(timetable_page: str):
                 code, location = _parse_course_vals(cell_str)
                 class_id = course_code_dict[code][1]
 
-                if is_theory:
-                    start_time = timetable_df.iloc[0, col_idx]
+                start_time = timetable_df.iloc[0, col_idx]
 
-                    cell = Period(
-                        class_id=class_id,
-                        slot=course_details[course_details["Class Nbr"] == class_id][
-                            "Slot - Venue"
-                        ]
-                        .iloc[0]
-                        .split(" - ")[0],
-                        courseName=course_code_dict[code][0],
-                        code=code,
-                        location=location,
-                        startTime=start_time,
-                        endTime=_get_theory_end_time(start_time),
-                    )
-
-                else:
-                    start_time = timetable_df.iloc[0, col_idx]
-
-                    cell = Period(
-                        class_id=class_id,
-                        slot=course_details[course_details["Class Nbr"] == class_id][
-                            "Slot - Venue"
-                        ]
-                        .iloc[0]
-                        .split(" - ")[0],
-                        courseName=course_code_dict[code][0],
-                        code=code,
-                        location=location,
-                        startTime=start_time,
-                        endTime=_get_lab_end_time(start_time),
-                    )
+                cell = Period(
+                    class_id=class_id,
+                    slot=course_details[course_details["Class Nbr"] == class_id][
+                        "Slot - Venue"
+                    ]
+                    .iloc[0]
+                    .split(" - ")[0],
+                    courseName=course_code_dict[code][0],
+                    code=code,
+                    location=location,
+                    startTime=start_time,
+                    endTime=_get_end_time(start_time, is_theory),
+                )
 
                 if cell not in timetable[day]:
                     timetable[day].append(cell)
