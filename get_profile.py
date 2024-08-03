@@ -11,9 +11,9 @@ from utils.payloads import get_profile_payload
 def _get_value_from_column1(text: str, df: pd.DataFrame):
     row = df[df[0] == text]
     if not row.empty:
-        return row.iloc[0, 1]
+        return str(row.iloc[0, 1])
     else:
-        return None
+        return str(None)
 
 
 async def _get_profile_page(
