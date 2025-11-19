@@ -6,8 +6,6 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from vtop_scraper.constants.bitmaps import bitmaps
-
 
 def pre_img(img):
     avg = sum(sum(e) for e in img) / (24 * 22)
@@ -36,7 +34,6 @@ def flatten(arr):
 
 def mat_mul(a, b):
     x, z, y = len(a), len(a[0]), len(b[0])
-    product_row = [0] * y
     product = [[0] * y for _ in range(x)]
 
     for i in range(x):

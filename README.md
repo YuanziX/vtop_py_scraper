@@ -99,7 +99,6 @@ vtop_scraper/
 ├── get_sem_id.py       # Semester ID retrieval
 ├── outing.py           # Outing application (placeholder)
 ├── constants/          # Constants and configuration
-│   ├── bitmaps.py
 │   ├── constants.py
 │   └── weights.json
 ├── models/             # Data models
