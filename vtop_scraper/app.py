@@ -1,15 +1,16 @@
 import uvicorn
 from aiohttp import ClientSession
-from gen_session import gen_session
-from get_marks import get_marks_data
-from get_grades import get_grades_data
-from get_profile import get_profile_data
-from fastapi.responses import JSONResponse
-from get_timetable import get_timetable_data
-from get_attendance import get_attendance_data
-from get_exam_schedule import get_examSchedule_data
-from get_sem_id import _get_all_sem_ids, _get_sem_id
 from fastapi import FastAPI, Request, HTTPException, status, Form
+from fastapi.responses import JSONResponse
+
+from vtop_scraper.gen_session import gen_session
+from vtop_scraper.get_marks import get_marks_data
+from vtop_scraper.get_grades import get_grades_data
+from vtop_scraper.get_profile import get_profile_data
+from vtop_scraper.get_timetable import get_timetable_data
+from vtop_scraper.get_attendance import get_attendance_data
+from vtop_scraper.get_exam_schedule import get_examSchedule_data
+from vtop_scraper.get_sem_id import _get_all_sem_ids, _get_sem_id
 
 app = FastAPI()
 
@@ -124,5 +125,10 @@ async def marks(
         return await get_marks_data(sess, username, semID, session_result)
 
 
-if __name__ == "__main__":
+def main():
+    """Run the FastAPI application."""
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+if __name__ == "__main__":
+    main()

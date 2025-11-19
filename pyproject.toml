@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "vtop-py-scraper"
+version = "0.1.0"
+description = "VTOP API scraper for attendance, grades, timetable, and more"
+authors = ["YuanziX"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "vtop_scraper"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.115.0"
+uvicorn = {extras = ["standard"], version = "^0.32.0"}
+aiohttp = "^3.10.0"
+pandas = "^2.2.0"
+numpy = "^1.26.0"
+pillow = "^10.4.0"
+python-multipart = "^0.0.9"
+beautifulsoup4 = "^4.12.0"
+lxml = "^5.3.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.0"
+pytest-asyncio = "^0.24.0"
+black = "^24.10.0"
+ruff = "^0.7.0"
+httpx = "^0.27.0"
+
+[tool.poetry.scripts]
+vtop-server = "vtop_scraper.app:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

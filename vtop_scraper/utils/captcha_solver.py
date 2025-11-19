@@ -1,9 +1,12 @@
+import base64
+import json
+from io import BytesIO
+from pathlib import Path
+
 import numpy as np
 from PIL import Image
-import json
-from constants.bitmaps import bitmaps
-import base64
-from io import BytesIO
+
+from vtop_scraper.constants.bitmaps import bitmaps
 
 def pre_img(img):
     avg = sum(sum(e) for e in img) / (24 * 22)
@@ -54,7 +57,8 @@ def solve(img):
     biases = None
     label_txt = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
     
-    with open("constants/weights.json", "r") as f:
+    weights_path = Path(__file__).parent.parent / "constants" / "weights.json"
+    with open(weights_path, "r") as f:
         data = json.load(f)
         weights = data["weights"]
         biases = data["biases"]

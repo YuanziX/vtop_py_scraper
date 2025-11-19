@@ -1,8 +1,10 @@
+from io import StringIO
+
 import aiohttp
 import pandas as pd
-from io import StringIO
-from constants.constants import vtop_gradeHistory_url
-from utils.payloads import get_gradeHistory_payload
+
+from vtop_scraper.constants.constants import vtop_gradeHistory_url
+from vtop_scraper.utils.payloads import get_gradeHistory_payload
 
 
 async def _get_grades_page(

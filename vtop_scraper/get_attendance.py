@@ -1,13 +1,14 @@
 import re
-import aiohttp
-import pandas as pd
 from io import StringIO
 
-from constants.constants import (
+import aiohttp
+import pandas as pd
+
+from vtop_scraper.constants.constants import (
     vtop_process_attendance_url,
     vtop_process_attendance_detail_url,
 )
-from utils.payloads import (
+from vtop_scraper.utils.payloads import (
     get_attendance_payload,
     get_attendance_detail_payload,
 )
@@ -94,7 +95,7 @@ async def _parse_attendance(
                         csrf,
                         semID,
                         username,
-                        re.search(f";(\w*_{code}_\d*)&", attendance_page).group(1),
+                        re.search(rf";(\w*_{code}_\d*)&", attendance_page).group(1),
                         _get_class_type(row["Course Detail"].split("-")[2].strip()),
                     )
                 ),

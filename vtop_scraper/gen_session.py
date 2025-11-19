@@ -1,8 +1,10 @@
-import aiohttp
-from constants.constants import user_agent_header
-from utils.captcha_solver import solve_base64
-from utils.payloads import get_login_payload
 import re
+
+import aiohttp
+
+from vtop_scraper.constants.constants import user_agent_header
+from vtop_scraper.utils.captcha_solver import solve_base64
+from vtop_scraper.utils.payloads import get_login_payload
 
 
 async def gen_session(sess: aiohttp.ClientSession, username: str, password: str):

@@ -1,10 +1,11 @@
 import re
-import aiohttp
-import pandas as pd
 from io import StringIO
 
-from utils.payloads import get_examSchedule_payload
-from constants.constants import vtop_doExamSchedule_url
+import aiohttp
+import pandas as pd
+
+from vtop_scraper.constants.constants import vtop_doExamSchedule_url
+from vtop_scraper.utils.payloads import get_examSchedule_payload
 
 
 async def _get_examSchedule_page(
@@ -34,7 +35,7 @@ async def _parse_examSchedule(examSchedule_page: str):
     for index, row in examSchedule_table.iterrows():
         if index == 0:
             continue
-        if re.search("\D", row[0]):
+        if re.search(r"\D", row[0]):
             current_exam = row[0]
             examSchedule_data[current_exam] = {}
         else:

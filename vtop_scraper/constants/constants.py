@@ -12,3 +12,5 @@ vtop_process_attendance_detail_url = f"{vtop_base_url}processViewAttendanceDetai
 vtop_doMarks_view_url = f"{vtop_base_url}examinations/doStudentMarkView"
 vtop_gradeHistory_url = f"{vtop_base_url}examinations/examGradeView/StudentGradeHistory"
 vtop_doExamSchedule_url = f"{vtop_base_url}examinations/doSearchExamScheduleForStudent"
+vtop_getOutingDetails_url = f"{vtop_base_url}hostel/StudentWeekendOuting"
+vtop_apply_outing_url = f"{vtop_base_url}hostel/saveOutingForm"

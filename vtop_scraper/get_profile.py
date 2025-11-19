@@ -1,11 +1,12 @@
 import re
 import string
-import aiohttp
-import pandas as pd
 from io import StringIO
 
-from constants.constants import vtop_profile_url
-from utils.payloads import get_profile_payload
+import aiohttp
+import pandas as pd
+
+from vtop_scraper.constants.constants import vtop_profile_url
+from vtop_scraper.utils.payloads import get_profile_payload
 
 
 def _get_value_from_column1(text: str, df: pd.DataFrame):

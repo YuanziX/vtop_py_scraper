@@ -1,11 +1,12 @@
+from io import StringIO
+
 import aiohttp
 import pandas as pd
-from io import StringIO
 from bs4 import BeautifulSoup
 
-from constants.constants import vtop_process_timetable_url
-from models.period import Period
-from utils.payloads import get_timetable_payload
+from vtop_scraper.constants.constants import vtop_process_timetable_url
+from vtop_scraper.models.period import Period
+from vtop_scraper.utils.payloads import get_timetable_payload
 
 
 DAYS_MAP = {

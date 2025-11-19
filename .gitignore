@@ -1,6 +1,8 @@
-tests/
 constants/priv_constants.py
 __pycache__/
 venv/
 test.py
 .vscode
+.pytest_cache/
+outing.py
+temp.py

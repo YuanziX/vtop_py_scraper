@@ -1,9 +1,10 @@
-import aiohttp
-import pandas as pd
 from io import StringIO
 
-from constants.constants import vtop_doMarks_view_url
-from utils.payloads import get_doMarks_view_payload
+import aiohttp
+import pandas as pd
+
+from vtop_scraper.constants.constants import vtop_doMarks_view_url
+from vtop_scraper.utils.payloads import get_doMarks_view_payload
 
 
 async def _get_doMarks_view_page(

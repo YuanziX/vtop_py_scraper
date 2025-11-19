@@ -1,8 +1,10 @@
 import re
+
 import aiohttp
 from bs4 import BeautifulSoup
-from constants.constants import vtop_semID_list_url
-from utils.payloads import get_attendance_semID_list_payload
+
+from vtop_scraper.constants.constants import vtop_semID_list_url
+from vtop_scraper.utils.payloads import get_attendance_semID_list_payload
 
 
 async def _get_sem_id(sess: aiohttp.ClientSession, username: str, csrf: str):
