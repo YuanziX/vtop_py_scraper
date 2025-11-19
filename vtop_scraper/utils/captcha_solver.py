@@ -8,6 +8,7 @@ from PIL import Image
 
 from vtop_scraper.constants.bitmaps import bitmaps
 
+
 def pre_img(img):
     avg = sum(sum(e) for e in img) / (24 * 22)
     bits = [[1 if val > avg else 0 for val in row] for row in img]
@@ -15,9 +16,17 @@ def pre_img(img):
 
 
 def saturation(d):
-    saturate = np.round(((np.max(d, axis=1) - np.min(d, axis=1)) * 255) / np.max(d, axis=1))
+    saturate = np.round(
+        ((np.max(d, axis=1) - np.min(d, axis=1)) * 255) / np.max(d, axis=1)
+    )
     img = saturate.reshape((40, 200))
-    bls = [img[7 + 5 * (i % 2) + 1:35 - 5 * ((i + 1) % 2), (i + 1) * 25 + 2:(i + 2) * 25 + 1] for i in range(6)]
+    bls = [
+        img[
+            7 + 5 * (i % 2) + 1 : 35 - 5 * ((i + 1) % 2),
+            (i + 1) * 25 + 2 : (i + 2) * 25 + 1,
+        ]
+        for i in range(6)
+    ]
     return bls
 
 
@@ -52,11 +61,12 @@ def max_soft(a):
 HEIGHT = 40
 WIDTH = 200
 
+
 def solve(img):
     weights = None
     biases = None
     label_txt = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
-    
+
     weights_path = Path(__file__).parent.parent / "constants" / "weights.json"
     with open(weights_path, "r") as f:
         data = json.load(f)
@@ -79,6 +89,7 @@ def solve(img):
         out += label_txt[index]
 
     return out
+
 
 def solve_base64(img_base64: str) -> str:
     return solve(Image.open(BytesIO(base64.b64decode(img_base64))))
